@@ -1,0 +1,462 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+/*
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  /*height: 60px;
+  background-color: #f5f5f5;
+}*/
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+body > .container {
+  padding: 60px 15px 0;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
+
+/*.footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}*/
+
+code {
+  font-size: 80%;
+}
+
+/*
+#loader {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: url('loading.gif') 50% 50% no-repeat rgb(249,249,249);
+}
+
+.loader {
+    border: 16px solid #f3f3f3; /* Light grey
+    border-top: 16px solid #3498db; /* Blue
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+*/
+/* Center the loader */
+/*
+#loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+*/
+/* Add animation to "page content" */
+/*
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+  from { bottom:-100px; opacity:0 }
+  to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom {
+  from{ bottom:-100px; opacity:0 }
+  to{ bottom:0; opacity:1 }
+}
+*/
+
+.buttonFixed {
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.2);
+    padding: 4px 0 12px;
+    margin: 0 12px;
+    display: block;
+    position:fixed;
+    bottom:25px;
+    right:0px;
+    border-radius: 50%;
+}
+
+.btnAdminCP {
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.2);
+    padding: 4px 0 12px;
+    margin: 0 12px;
+    display: block;
+    position:fixed;
+    bottom:74px;
+    right:0px;
+    border-radius: 50%;
+}
+
+.addBrg {
+    background-image: url(../icon/add-icon-44x44.png);
+}
+
+.editBrg {
+    background-image: url(../icon/edit-icon-44x44.png);
+}
+
+.settingBrg {
+    background-image: url(../icon/settings-icon-44x44.png);
+}
+
+.callBrg {
+    background-image: url(../icon/phone-icon-44x44.png);
+}
+
+.homeBrg {
+    background-image: url(../icon/home-icon-44x44.png);
+}
+
+.adminCP {
+    background-image: url(../icon/admin-icon-44x44.png);
+}
+
+.online .input-wrapper {
+    position: relative;
+    height: 64px;
+    width: 100%;
+    padding: 10px;
+    padding-top: 0;
+    visibility: hidden;
+}
+
+.online .input-wrapper textarea {
+    padding-right: 40px;
+    border: 1px solid #d7dee0;
+}
+
+
+.footer {
+    /*background-color: #rgb(169, 176, 182);*/
+    height: 15px;
+}
+
+.footer p {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+
+.general h4 {
+    text-align: left;
+}
+
+.general a {
+    color: black;
+}
+
+.project h4 {
+    text-align: left;
+}
+
+.project a {
+    color: black;
+}
+
+.img-thumbnail {
+    width: 200px;
+    height: 200px;
+}
+
+.img-desciption h4 {
+    text-align: left;
+}
+
+.table td {
+    text-align: left;
+}
+
+.img-member h4 {
+    text-align: center;
+}
+
+.own-desciption h4 {
+    text-align: left;
+}
+
+.div-center {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    width: ...;
+    height: ...;
+    display: block;
+}
+
+.div-center * {
+    vertical-align: middle;
+}
+
+.div-center span {
+    display: inline-block;
+    height: 100%;
+    width: 1px;
+}
+
+.img-center {
+    background:#333;
+    width:400px;
+    height:400px;
+    padding:10px;
+    color:#fff;
+    margin:0 auto;
+    position:relative;
+}
+
+.profile-avatar {
+    border-radius: 50%;
+    width: 75px;
+    height: 75px;
+}
+
+.img-center img{
+  	margin:auto;
+  	position:absolute;
+  	top:0; left:0; right:0; bottom:0;
+}
+
+.jumbotron {
+    text-align: center;
+}
+
+.button-form {
+    margin: auto;
+    position: relative;
+    margin-right: 0px;
+    margin-bottom: 20px;
+}
+
+.header-menu-top {
+    background-image: url(../images/bg-header-menu-top.jpg);
+    background-repeat: repeat-x;
+    background-position: top;
+    background-color: #ececec;
+    border-radius: 0px 0px 7px 7px;
+    border: solid 1px #f2f2f2;
+    padding: 5px;
+    line-height: 20px;
+    color: #353535;
+    margin-bottom: 0px;
+}
+
+.header-menu-top .box-left-blog {
+    float: none;
+}
+
+.str_wrap {
+    overflow: hidden;
+    width: 93%;
+    font-size: 14px;
+    line-height: 24px;
+    position: relative;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+    background: none;
+    white-space: nowrap;
+    min-height: 30px;
+    float: left;
+}
+
+.str_move {
+	white-space:nowrap;
+	position:absolute;
+	top:0;
+	left:0;
+	cursor:move;
+	z-index: 99999
+}
+
+body > .container {
+    padding: 0 15px 0;
+}
+
+.homeproduct {
+    display: block;
+    overflow: hidden;
+    margin: 10px auto 0;
+}
+
+.homeproduct li .bginfo {
+    display: block;
+    overflow: hidden;
+    background: #fff;
+    height: 96%;
+    padding: 2% 0;
+    font-size: 12px;
+    color: #fff;
+    line-height: 16px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 9px;
+    bottom: 0;
+    z-index: 9;
+    -webkit-transition-duration: .7s;
+    -moz-transition-duration: .7s;
+    -o-transition-duration: .7s;
+    transition-duration: .7s;
+    -ms-opacity: 0;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    pointer-events: none;
+}
+
+.homeproduct li label.installment {
+    background: #ff6a00;
+}
+
+.homeproduct li .bginfo .name {
+    display: block;
+    line-height: 1.3em;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    padding: 0;
+    margin: 0 10px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+}
+
+.labs-row {
+    border-style: ridge;
+    background-color: white;
+}
+
+.divider {
+  height: 1px;
+  width:100%;
+  display:block; /* for use on default inline elements like span */
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
+
+.login-page {
+  background: url("../icon/security_icon_1024x683_double_2.png") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.profile-info {
+  text-align: left;
+}
+
+.roles-admin {
+  text-align: left;
+}
+
+.checkbox-inline+.checkbox-inline {
+    margin-top: 0;
+    margin-left: 0px;
+}
+
+.navbar-color {
+    background-color: rgb(213, 184, 33);
+    color: white;
+}
+
+.navbar-color>span,a,b {
+    color: white;
+}
+
+.navbar-default .navbar-nav>.active>a {
+    color: #555;
+    background-color: blueviolet;
+}
+
+select {
+    width: 220px;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+}
+
+select, input[type="file"] {
+    height: 30px;
+    line-height: 30px;
+}
+
+ul.thumbnails.image_picker_selector {
+    overflow: auto;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+ul.thumbnails.image_picker_selector li .thumbnail {
+    padding: 6px;
+    border: 1px solid #dddddd;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.thumbnail > img {
+    display: block;
+    max-width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+div {
+    display: block;
+}
