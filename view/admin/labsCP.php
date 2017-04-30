@@ -99,7 +99,7 @@ echo $paging->html();
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="labMap">URL Google Map</label>
-                          <input type="text" class="form-control" name="labMap" id="labMap" value="không có" placeholder="Nhập địa chỉ URL từ Google Map">
+                          <input type="text" class="form-control" name="labMap" id="labMap" placeholder="Nhập địa chỉ URL từ Google Map">
                       </fieldset>
                 </div>
                 <div class="modal-footer">

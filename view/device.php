@@ -31,19 +31,17 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                       if(isset($_GET['page']) && (int)$_GET['page'])
                            $start=($_GET['page']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
                       else $start=0;
-                      // var_dump($start);
-                      $val = "SELECT *,DATE_FORMAT( dateImport,  '%d/%m/%Y' ) AS date FROM device_info a,partner_info b,images c WHERE (a.idProducer = b.idProducer) AND (a.idImg = c.idImg) ORDER BY a.idDevice ASC limit $start,$row_per_page";
-                      $retval = $db->query($val);
+                      $val_device = "SELECT *,DATE_FORMAT( dateImport,  '%d/%m/%Y' ) AS date FROM device_info a,partner_info b WHERE (a.idProducer = b.idProducer) ORDER BY a.idDevice ASC limit $start,$row_per_page";
 
-                      foreach ($db->fetch_assoc($val, 0) as $key => $row) {
+                      foreach ($db->fetch_assoc($val_device, 0) as $key => $row_device) {
                         echo '<tr>
-                            <td>'.$row['idDevice'].'</td>
-                            <td><img src="';echo $_DOMAIN.$row['url']; echo '" style="width:100px;height:100px;"/></td>
-                            <td>'.$row['nameDevice'].'</td>
-                            <td>'.$row['description'].'</td>
-                            <td>'.$row['date'].'</td>
-                            <td>'.$row['status'].'</td>
-                            <td>'.$row['total'].'</td>
+                            <td>'.$row_device['idDevice'].'</td>
+                            <td><img src="';echo $_DOMAIN.$row_device['urlImg']; echo '" style="width:100px;height:100px;"/></td>
+                            <td>'.$row_device['nameDevice'].'</td>
+                            <td>'.$row_device['description'].'</td>
+                            <td>'.$row_device['date'].'</td>
+                            <td>'.$row_device['status'].'</td>
+                            <td>'.$row_device['total'].'</td>
                             <td>
                                 <button type="button" id="borrowDevice2" class="btn btn-primary" data-toggle="modal" data-target="#borrowDevice"><span class="glyphicon glyphicon-bookmark"></span></button>
                             </td>

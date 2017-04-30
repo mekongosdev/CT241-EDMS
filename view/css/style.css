@@ -164,6 +164,10 @@ code {
     background-image: url(../icon/admin-icon-44x44.png);
 }
 
+.search-btn {
+    background-image: url(../icon/search-icon-44x44.png);
+}
+
 .online .input-wrapper {
     position: relative;
     height: 64px;

@@ -17,10 +17,10 @@ if (isset($_GET["tab"])) {
             echo '<div class="container">
                 <legend>
                     <h1>Thông tin Lab</h1></legend>
-                <span class="name">'.$data_lab_info['nameLab'].' </span><a href="'.$_DOMAIN.'#" data-toggle="modal" data-target="#editLab">Chỉnh sửa</a>
+                <span class="name"><strong>'.$data_lab_info['nameLab'].' </strong></span>
                 <div class="divider"></div>
                 <span>Đơn vị: '.$data_lab_info['unit'].'</span><br />
-                <span>Điện thoại: '.$data_lab_info['phone'].'</span><br />
+                <span>Điện thoại: <a href="tel:'.$data_lab_info['phone'].'">'.$data_lab_info['phone'].'</a></span><br />
                 <span>Địa chỉ: '.$data_lab_info['address'].'</span><br />
                 <span>Google Maps: <a href="'.$data_lab_info['location'].'">'.$data_lab_info['location'].'</a></span>
                 <div class="divider"></div>';
@@ -28,9 +28,11 @@ if (isset($_GET["tab"])) {
                 $total_project = $db->num_rows($sql_get_project);
                 echo '
                 <span>Các dự án: <span class="badge">'.$total_project.'</span></span><br  />';
-                foreach ($db->fetch_assoc($sql_get_project, 0) as $key => $value) {
-                  echo '- '.$value['nameProject'].' - '.$value['nameUser'].'<br  />';
-                }
+                if ($total_project > 0) {
+                  foreach ($db->fetch_assoc($sql_get_project, 0) as $key => $value_lab) {
+                    echo '- '.$value_lab['nameProject'].' - '.$value_lab['nameUser'].'<br  />';
+                  }
+                } else echo '<br><div class="alert alert-info">Chưa có dự án nào.</div>';
                 // <a href="'.$_DOMAIN.'#">- '.$data_lab_info['nameProject'].' - '.$data_lab_info['nameUser'].'</a><br  />
             echo '</div>
             ';
@@ -38,6 +40,8 @@ if (isset($_GET["tab"])) {
         } else new Redirect($_DOMAIN.'labs');
       }
     } else {
+      echo '<div class="row" style="margin-left:30px;margin-right:30px;">
+        <center>';
   $sql_get_user = "SELECT * FROM lab_info ORDER BY idLab DESC";
   if ($db->num_rows($sql_get_user)) {
     $row="SELECT idLab FROM lab_info";
@@ -54,60 +58,24 @@ if (isset($_GET["tab"])) {
 
     foreach ($db->fetch_assoc($val, 0) as $key => $row) {
       echo '
-      <div class="row">
-      <center>
       <div class="col-md-4">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <span class="name">'.$row['nameLab'].'</span>
+            <span class="name"><h4><strong>'.$row['nameLab'].'</strong></h4></span>
           </div>
           <div class="panel-body">
             <span>Đơn vị: '.$row['unit'].'</span><br />
-            <span>Điện thoại: '.$row['phone'].'</span><br />
+            <span>Điện thoại: <a href="tel:'.$row['phone'].'">'.$row['phone'].'</a></span><br />
             <span>Địa chỉ: '.$row['address'].'</span><br />
             <span><a href="'.$_DOMAIN.'labs/info/'.$row['idLab'].'">Xem chi tiết</a></span>
           </div>
         </div>
       </div>';
-    }
+    } echo '
+    </center>
+  </div>';
   } else {
       echo '<br><br><div class="alert alert-info">Chưa có Lab nào.</div>';
   }
 }
-echo '
-<!--Update Lab-->
-<div id="editLab" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-<div class="modal-dialog">
-<div class="modal-content">
-<div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-  <h4 class="modal-title" id="">Chỉnh sửa Lab</h4>
-</div>
-<div class="modal-body">
-    <form>
-      <fieldset class="form-group">
-        <label for="name">Tên Lab</label>
-        <input type="text" class="form-control" name="name" id="name" placeholder="Nhập tên Lab">
-      </fieldset>
-      <fieldset class="form-group">
-        <label for="unit">Đơn vị</label>
-        <input type="text" class="form-control" name="unit" id="unit" placeholder="Nhập đơn vị">
-      </fieldset>
-      <fieldset class="form-group">
-        <label for="phone">Điện thoại</label>
-        <input type="text" class="form-control" name="phone" id="phone" placeholder="Nhập số điện thoại">
-      </fieldset>
-      <fieldset class="form-group">
-        <label for="address">Địa chỉ</label>
-        <input type="text" class="form-control" name="address" id="address" placeholder="Nhập địa chỉ">
-      </fieldset>
-</div>
-<div class="modal-footer">
-  <button type="submit" class="btn btn-primary" name="editLab">Đồng ý</button></form>
-  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-</div>
-</div>
-</div>
-</div>
-';
 ?>
