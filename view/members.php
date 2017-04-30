@@ -32,7 +32,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                       <div class="panel-body">
                         <span>'.$row['idUser'].'</span><br />
                         <span>'.$row['fullName'].'</span><br />
-                        <span>'.$row['rolesName'].'</span><br />
+                        <span>'.$row['roleName'].'</span><br />
                         <span><a href="'.$_DOMAIN.'profile/'.$row['idUser'].'">Chi tiết</a></span>
                       </div>
                     </div>

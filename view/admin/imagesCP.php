@@ -125,7 +125,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                 $size_img = $_FILES['img_up']['size'][$name]; // Dung lượng file
 
                 if ($size_img > 10485760){
-                    echo "File không được lớn hơn 10MB";
+                    new Warning('','File không được lớn hơn 10MB');
                 } else {
                     // Upload file
                     $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
@@ -137,8 +137,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                     // Thêm dữ liệu vào table
                     $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
                     $db->query($sql_up_file);
-                    // echo '<div class="alert alert-success">File Uploaded</div>';
-                    new Redirect($_DOMAIN.'admin/images');
+                    new Success($_DOMAIN.'admin/images','Upload ảnh thành công');
                     }
                   }
                 }

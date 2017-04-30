@@ -1,7 +1,7 @@
 <a href="<?php echo $_DOMAIN; ?>admin/device" class="buttonFixed adminCP"></a>
 
 <?php
-// Nếu đăng nhập
+// Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 ?>
 
@@ -107,26 +107,6 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 
         echo $paging->html();
         ?>
-
-
-    <!-- <div id="borrowDevice" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Bạn muốn mượn thiết bị?</h4>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Vui lòng đăng ký và chờ!</strong></p>
-                    <form>
-                <div class="modal-footer">
-                      <a href="borrow" type="button" class="btn btn-primary">Yes</a>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-                        </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
 
     <div id="borrowDevice" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
       <div class="modal-dialog">

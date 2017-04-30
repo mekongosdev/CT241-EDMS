@@ -10,7 +10,7 @@
 
                     // Hiển thị cấp bậc tài khoản
                     // Nếu tài khoản là admin
-                    switch ($data_user['rolesName']) {
+                    switch ($data_user['roleName']) {
                       case 'Owner':
                           echo '<span class="label label-danger">Chủ sở hữu</span>';
                           break;
@@ -109,7 +109,7 @@
 
         // Phân quyền sidebar
         // Nếu tài khoản là admin
-        // if ($data_user['rolesName'] == 'Owner')
+        // if ($data_user['roleName'] == 'Owner')
         // {
         //     echo
         //     '

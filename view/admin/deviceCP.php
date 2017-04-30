@@ -3,6 +3,12 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
 
 <a href="#" class="buttonFixed addBrg" data-toggle="modal" data-target="#addDevice"></a>
 
+<h3>Quản lý thiết bị</h3>
+  <button class="btn btn-success" data-toggle="modal" data-target="#addDevice">Thêm thiết bị mới</button>
+  <a href="<?php echo $_DOMAIN; ?>admin/device" class="btn btn-default">
+      <span class="glyphicon glyphicon-repeat"></span> Tải lại
+  </a>
+
 <table id="infoDevice" class="table table-striped">
         <thead>
             <tr>
@@ -29,13 +35,12 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
                    $start=($_GET['page']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
               else $start=0;
               // var_dump($start);
-              $val = "SELECT *,DATE_FORMAT( dateImport,  '%d/%m/%Y' ) AS date FROM device_info a,partner_info b,images c WHERE (a.idProducer = b.idProducer) AND (a.idImg = c.idImg) ORDER BY a.idDevice ASC limit $start,$row_per_page";
-              $retval = $db->query($val);
+              $val_device = "SELECT *,DATE_FORMAT( dateImport,  '%d/%m/%Y' ) AS date FROM device_info a,partner_info b WHERE (a.idProducer = b.idProducer) ORDER BY a.idDevice DESC limit $start,$row_per_page";
 
-              foreach ($db->fetch_assoc($val, 0) as $key => $row) {
+              foreach ($db->fetch_assoc($val_device, 0) as $key => $row) {
                 echo '<tr>
                     <td>'.$row['idDevice'].'</td>
-                    <td><img src="';echo $_DOMAIN.$row['url']; echo '" style="width:100px;height:100px;"/></td>
+                    <td><img src="';echo $_DOMAIN.$row['urlImg']; echo '" style="width:100px;height:100px;"/></td>
                     <td>'.$row['nameDevice'].'</td>
                     <td>'.$row['description'].'</td>
                     <td>'.$row['date'].'</td>
@@ -74,7 +79,7 @@ echo $paging->html();
 ?>
 
     <div id="addDevice" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -116,7 +121,7 @@ echo $paging->html();
                             <input type="text" class="form-control" name="descriptionDevice" id="descriptionDevice" placeholder="Nhập mô tả về thiết bị">
                         </fieldset>
                         <fieldset class="form-group">
-                            <label for="partnerDevice">Nhà cung cấp</label>
+                            <label for="partnerDevice">Nhà cung cấp/sản xuất</label>
                             <select class="form-control" name="partnerDevice" id="partnerDevice">
                               <option value="Other">Other</option>
                               <?php
@@ -131,20 +136,7 @@ echo $paging->html();
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="pictureDevice">Hình ảnh</label>
-                            <!-- <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#viewDevice">View</a> -->
-                            <!-- <input type="file" class="form-control" accept="image/*" name="imgDevice" id="pictureDevice">
-                            <small class="text-muted">Ảnh được chọn phải nhỏ hơn 5MB. Định dạng hỗ trợ: jpeg/jpg, png, gif.</small> -->
-                            <!-- <div class="picker"> -->
-                            <select class="form-control image-picker show-html" name="pictureDevice" id="pictureDevice">
-                              <?php
-                                  //Chọn nhà sản xuất
-                                  $sql_producer = "SELECT idImg,url FROM images";
-                                  foreach ($db->fetch_assoc($sql_producer,0) as $key => $data) {
-                                    // echo '<option data-img-src="'.$_DOMAIN.$data['url'].'" data-img-class="first" data-img-alt="Page 1" value="'.$data['idImg'].'">'. substr($data_img['url'], 12).'</option>';
-                                    echo '<option value="'.$data['idImg'].'" style="background-image:'."url('".$_DOMAIN.$data['url']."'".');">'. substr($data_img['url'], 12).'</option>';
-                                  }
-                              ?>
-                            </select>
+                            <input type="file" class="form-control" name="icon_up" id="pictureDevice" accept="image/*">
                         </fieldset>
                 </div>
                 <div class="modal-footer">
@@ -154,8 +146,6 @@ echo $paging->html();
             </div>
         </div>
     </div>
-
-    <!-- <script>$("select").imagepicker()</script> -->
 
     <!-- <div id="editDevice" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
@@ -251,41 +241,34 @@ echo $paging->html();
         $totalDevice = $_POST['totalDevice'];
         $descriptionDevice = $_POST['descriptionDevice'];
         $producerDevice = $_POST['partnerDevice'];
-        $idImg = $_POST['pictureDevice'];
 
-        // $img = $_FILE['imgDevice'];
-        // Xử Lý upload ảnh
-        //   if (isset($_FILES['imgDevice'])) {
-        //         $dir = 'view/images/';
-        //         $name_img = stripslashes($_FILES['imgDevice']['name']);
-        //         $source_img = $_FILES['imgDevice']['tmp_name'];
-        //         $size_img = $_FILES['imgDevice']['size']; // Dung lượng file
-        //
-        //         if ($size_img > 5242880){
-        //             echo "File không được lớn hơn 5MB";
-        //         } else {
-        //             // Upload file
-        //             $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
-        //             move_uploaded_file($source_img, $path_img); // Upload file
-        //             $array = (explode(".",$name_img));
-        //             $type_img = $array[1];// Loại file
-        //             $url_img = $path_img; // Đường dẫn file
-        //
-        //             // Thêm dữ liệu vào table
-        //             $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
-        //             $db->query($sql_up_file);
-        //             }
-        //         }
-        //
-        // $sql_get_img = "SELECT * FROM images ORDER BY idImg DESC";
-        // $idImg = $db->num_rows($sql_get_img);
-        // $idImg = $idImg + 1;
-
-        if($nameDevice && $dateDevice && $statusDevice && $totalDevice && $producerDevice && $idImg && $currencyDevice && $descriptionDevice)
+        if($nameDevice && $dateDevice && $statusDevice && $totalDevice && $producerDevice && $currencyDevice && $descriptionDevice)
            {
-             $sql="INSERT INTO device_info(idProducer,idImg,nameDevice,status,currency,pricing,total,dateImport,description) VALUES ('$producerDevice','$idImg','$nameDevice','$statusDevice','$currencyDevice',0,'$totalDevice','$dateDevice','$descriptionDevice')";
-             $query = $db->query($sql);
-             new Redirect($_DOMAIN.'admin/device');
-          } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+             // Xử Lý Upload
+             if (isset($_FILES['icon_up'])) {
+                 $dir_img = 'view/images/';
+                 $name_img = stripslashes($_FILES['icon_up']['name']);
+                 $source_img = $_FILES['icon_up']['tmp_name'];
+                 $size_img = $_FILES['icon_up']['size']; // Dung lượng file
+
+                   if ($size_img > 10485760){
+                       new Warning('','File không được lớn hơn 10MB');
+                   } else {
+                       // Upload file
+                       $path_img = $dir_img.$name_img; // Đường dẫn thư mục chứa file
+                       move_uploaded_file($source_img, $path_img); // Upload file
+                       $array = (explode(".",$name_img));
+                       $type_img = $array[1];// Loại file
+                       $url_img = $path_img; // Đường dẫn file
+
+                       // Thêm ảnh vào table images
+                       $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
+                       $db->query($sql_up_file);
+                       }
+                   }
+              $sql_add_new_device = "INSERT INTO device_info(idProducer,urlImg,nameDevice,status,currency,pricing,total,dateImport,description) VALUES ('$producerDevice','$url_img','$nameDevice','$statusDevice','$currencyDevice',0,'$totalDevice','$dateDevice','$descriptionDevice')";
+              $query = $db->query($sql_add_new_device);
+             new Success($_DOMAIN.'admin/device','Thêm thiết bị mới thành công');
+          } else new Warning($_DOMAIN.'admin/device','Vui lòng điền đầy đủ thông tin');
         }
     ?>

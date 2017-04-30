@@ -1,5 +1,13 @@
 <a href="#" class="buttonFixed addBrg" data-toggle="modal" data-target="#addRole"></a>
 
+<h3>Tùy biến phân quyền</h3>
+  <button class="btn btn-success" data-toggle="modal" data-target="#addRole">Thêm nhóm quyền</button>
+  <a href="<?php echo $_DOMAIN; ?>admin/rolesCP" class="btn btn-default">
+      <span class="glyphicon glyphicon-repeat"></span> Tải lại
+  </a>
+  <button class="btn btn-danger" data-toggle="modal" data-target="#delRole">Xóa nhóm quyền đang xem</button>
+
+
 <script type="text/javascript">
 $(document).ready(function() {
   $('#roleThisUser').on('change', function() {
@@ -9,10 +17,10 @@ $(document).ready(function() {
 });
 </script>
 
-<form class="form-horizontal" action="" method="post">
+<h4>Tên nhóm quyền</h4>
+<form class="form-horizontal" action="<?php echo $_DOMAIN; ?>admin/rolesCP" method="post">
   <div class="form-group">
-    <div class="col-sm-10">
-      <label for="roleThisUser">Tên nhóm quyền</label>
+    <div class="col-sm-6">
       <select class="form-control" name="roleThisUser" id="roleThisUser">
         <?php
           $sql_get_roles = "SELECT * FROM roles_cp ORDER BY idRole ASC";
@@ -20,30 +28,68 @@ $(document).ready(function() {
             echo '<option value="'.$roleName['roleName'].'">'.$roleName['roleName'].'</option>'; } ?>
       </select>
     </div>
-    <div class="col-sm-2">
-      <!--input type="submit" class="btn btn-primary" name="goRole" value="Xem"-->
-      <input type="submit" class="hidden" name="goRole" value="Xem">
+    <div class="col-sm-4">
+      <input type="submit" class="form-inline btn btn-default" name="goRole" value="Xem">
     </div>
   </div>
 </form>
 
-<button class="btn btn-success" data-toggle="modal" data-target="#addRole">Thêm nhóm quyền</button>
-
 <?php
 if(isset($_POST['goRole'])) {
-    $roleNamecp = $_POST['roleThisUser'];
+  $roleNamecp = $_POST['roleThisUser'];
 } else {
   $roleNamecp = 'Owner';
 }
 
 ?>
 
+<!-- Xóa nhóm quyền -->
+<div class="modal fade" id="delRole" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Xóa nhóm quyền</h4>
+      </div>
+      <div class="modal-body">
+        <form action="<?php echo $_DOMAIN; ?>admin/rolesCP" method="post">
+            <input type="hidden" name="toRole" id="toRole" value="<?php echo $roleNamecp; ?>"/>
+            <center>
+                <h5>Bạn đang xóa quyền <?php echo $roleNamecp; ?>! Hành động này không thể hoàn tác.</h5>
+                <h4>Vui lòng xác nhận việc xóa quyền!</h4>
+            </center>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-danger" name="delThisRole">Xác nhận xóa</button></form>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<?php
+if (isset($_POST['delThisRole'])) {
+  $delRole = $_POST['toRole'];
+
+  $sql_del_roleName = "DELETE FROM `roles_cp` WHERE roleName = '$delRole'";
+
+  if ($delRole == 'Owner') {
+      new Warning($_DOMAIN.'admin/rolesCP','Không thể xóa quyền Owner. Vui lòng báo với quản trị viên nếu đó là lỗi.');
+  } else {
+      $db->query($sql_del_roleName);
+      new Success($_DOMAIN.'admin/rolesCP','Xóa quyền thành công');
+  }
+}
+?>
+
+
+<!-- Thêm nhóm quyền -->
 <div class="modal fade" id="addRole" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="">Thêm nhóm quyền</h4>
+        <h4 class="modal-title">Thêm nhóm quyền</h4>
       </div>
       <div class="modal-body">
         <form class="form-horizontal" action="<?php echo $_DOMAIN; ?>admin/rolesCP" method="post">
@@ -73,7 +119,7 @@ if(isset($_POST['goRole'])) {
   if(isset($_POST['addNewRole'])){
     if($_POST['roleName'] == NULL||$_POST['roleDescription'] == NULL)
      {
-      echo "Vui lòng nhập tên quyền hoặc mô tả nhóm quyền còn bỏ trống<br />";
+      new Warning($_DOMAIN.'admin/rolesCP','Vui lòng nhập tên quyền hoặc mô tả nhóm quyền còn bỏ trống');
      }
      else
      {
@@ -82,9 +128,9 @@ if(isset($_POST['goRole'])) {
      }
      if($roleName && $roleDescription)
        {
-         $sql="insert into roles_cp(roleName,roleDesc,rolesGroup) values('".$roleName."','".$roleDescription."','profile')";
+         $sql="INSERT INTO roles_cp(roleName,roleDesc,rolesGroup) VALUES('".$roleName."','".$roleDescription."','profile')";
          $query = $db->query($sql);
-         echo "Đã thêm thành công quyền mới với chức năng mặc định là Profile - Xem thông tin thành viên!";
+         new Warning($_DOMAIN.'admin/rolesCP','Đã thêm thành công quyền mới với chức năng mặc định là Profile - Xem thông tin thành viên!');
       }
     }
 
@@ -127,12 +173,12 @@ if(isset($_POST['saveRole'])) {
         //update
         $upd_qry="UPDATE roles_cp SET rolesGroup='".$all_value."', roleDesc='".$roleDesc."' WHERE roleName='".$name."'";
         $db->query($upd_qry);
-        echo "Thành công!";
+        new Success($_DOMAIN.'admin/rolesCP','Thành công!');
   } else
     {
         //insert
         $ins_qry="INSERT INTO roles_cp(rolesGroup) VALUES('".$all_value."')";
-        mysql_query($ins_qry);
+        $db->query($ins_qry);
   }
 }
 ?>
