@@ -3,17 +3,6 @@
 // Nếu đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 
-// // Nếu đăng nhập
-// if ($user)
-// {
-    // Nếu tài khoản là tác giả
-    // if ($data_user['position'] == 0)
-    // {
-    //     echo '<div class="alert alert-danger">Bạn không có đủ quyền để vào trang này.</div>';
-    // }
-    // Ngược lại tài khoản là admin
-    // else if ($data_user['position'] == 1)
-    // {
         echo '<h3>Tài khoản</h3>';
         // Lấy tham số ac
         if (isset($_GET['act']))

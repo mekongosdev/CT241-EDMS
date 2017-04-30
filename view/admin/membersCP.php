@@ -28,8 +28,8 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
               $rows=$db->num_rows($row);
               if ($rows>$row_per_page) $page=ceil($rows/$row_per_page);
               else $page=1;
-              if(isset($_GET['page']) && (int)$_GET['page'])
-                   $start=($_GET['page']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
+              if(isset($_GET['act']) && (int)$_GET['act'])
+                   $start=($_GET['act']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
               else $start=0;
               // var_dump($start);
               $val = "SELECT * FROM user_info ORDER BY idUser ASC limit $start,$row_per_page";
@@ -38,9 +38,9 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
               foreach ($db->fetch_assoc($val, 0) as $key => $row) {
                 echo '<tr>
                     <td>'.$row['idUser'].'</td>
-                    <td>'.$row['fullName'].'</td>
-                    <td>'.$row['phone'].'</td>
-                    <td>'.$row['email'].'</td>
+                    <td><a href="'.$_DOMAIN.'profile/'.$row['idUser'].'">'.$row['fullName'].'</td>
+                    <td><a href="tel:'.$row['phone'].'">'.$row['phone'].'</td>
+                    <td><a href="mailto:'.$row['email'].'">'.$row['email'].'</td>
                     <td>
                         <button type="button" id="editMembers" class="btn btn-primary" data-toggle="modal" data-target="#editMember"><span class="glyphicon glyphicon-pencil"></span></button>
                     </td>
@@ -58,11 +58,11 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
 $row="SELECT idUser FROM user_info";
 $rows=$db->num_rows($row);
 $config = array(
-    'current_page'  => isset($_GET['page']) ? $_GET['page'] : 1, // Trang hiện tại
+    'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => '?action=history&page={page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => '?action=history',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/members/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/members',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -72,6 +72,7 @@ $paging->init($config);
 
 echo $paging->html();
 ?>
+</div>
 
     <div id="addMember" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">

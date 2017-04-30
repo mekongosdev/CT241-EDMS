@@ -22,10 +22,19 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
         </thead>
         <tbody>
           <?php
-          $val = "SELECT * FROM partner_info";
-          $retval = $db->query($val);
+          $sql_get_producer = "SELECT * FROM partner_info ORDER BY idProducer DESC";
+          if ($db->num_rows($sql_get_producer)) {
+              $row="SELECT idProducer FROM partner_info";
+              $row_per_page=10;
+              $rows=$db->num_rows($row);
+              if ($rows>$row_per_page) $page=ceil($rows/$row_per_page);
+              else $page=1;
+              if(isset($_GET['act']) && (int)$_GET['act'])
+                   $start=($_GET['act']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
+              else $start=0;
+          $val_producer = "SELECT * FROM partner_info limit $start,$row_per_page";
 
-          foreach ($db->fetch_assoc($val, 0) as $key => $row) {
+          foreach ($db->fetch_assoc($val_producer, 0) as $key => $row) {
             echo '<tr>
                 <td>'.$row['idProducer'].'</td>
                 <td>'.$row['nameProducer'].'</td>
@@ -35,9 +44,33 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
                 <td><a type="button" class="btn btn-primary" data-toggle="modal" data-target="#editProducer"><span class="glyphicon glyphicon-pencil"></span></a></td>
             </tr>';
           } //<td><a href="?action=transaction-edit&id='.$row['id'].'"><span class="glyphicon glyphicon-pencil"></span></a></td>
+        } else {
+            echo '<br><br><div class="alert alert-info">Chưa có nhà cung cấp/sản xuất nào.</div>';
+        }
           ?>
         </tbody>
     </table>
+
+<div class="container">
+<?php
+$row="SELECT idProducer FROM partner_info";
+$rows=$db->num_rows($row);
+$config = array(
+    'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
+    'total_record'  => $rows, // Tổng số record
+    'limit'         => 10,// limit
+    'link_full'     => $_DOMAIN.'admin/producer/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/producer',// Link trang đầu tiên
+    'range'         => 3 // Số button trang bạn muốn hiển thị
+);
+
+$paging = new Pagination();
+
+$paging->init($config);
+
+echo $paging->html();
+?>
+</div>
 
     <div id="addProducer" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
