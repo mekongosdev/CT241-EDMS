@@ -4,8 +4,42 @@
 // Nếu đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 ?>
-    <legend>
-        <h1>Danh sách Thiết bị Nhúng</h1></legend>
+
+<legend>
+    <h1>Danh sách Thiết bị Nhúng</h1></legend>
+<?php
+  if (isset($_POST['newBorrowDevice'])) {
+      $idDevice = $_POST['toIdDevice'];
+      $idProject = $_POST['toProject'];
+      $total = $_POST['totalBorrow'];
+      $user_borrow = $user;//Thanh vien dang dang nhap
+
+      //Get idDevice hien tai va xuat ra idDevice moi nhat
+      $qry_get_idBorrowDevice = "SELECT idBorrowDevice WHERE borrow_device";
+      if ($db->num_rows($qry_get_idBorrowDevice)) {
+         $idNow = $db->num_rows($qry_get_idBorrowDevice);
+         $idNewest = $idNow + 1;
+      } else $idNewest = 1;
+      //Dem tong so thiet bi
+      $qry_total = "SELECT total FROM device_info WHERE idDevice = '$idDevice'";
+      foreach ($db->fetch_assoc($qry_total,0) as $key => $result) {
+        $totalDevice = $result['total'];
+      }
+      $totalNow = $totalDevice - $total;
+      $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
+      //Ghi nhan qua trinh muon
+      $qry_borrow = "INSERT INTO borrow_device(idDevice,idProject,total) VALUES ('$idDevice','$idProject','$total')";
+      $qry_borrow_detail = "INSERT INTO borrow_device_detail(idBorrowDevice,idUser,status) VALUES ('$idNewest','$user_borrow',0)";//status = 0 -> waiting accept
+      if ($totalDevice > 0) {
+          if ($total <= $totalDevice) {
+              $db->query($qry_totalDevice_now);
+              $db->query($qry_borrow);
+              $db->query($qry_borrow_detail);
+              new Success($_DOMAIN.'device','Đăng ký mượn thành công');
+          } else new Warning($_DOMAIN.'device','Vượt quá số lượng hiện có');
+      } else new Warning($_DOMAIN.'device','Không còn thiết bị này để mượn');
+  }
+?>
         <table id="infoDevice" class="table table-striped">
                 <thead>
                     <tr>
@@ -15,7 +49,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                         <th>Mô tả</th>
                         <th>Ngày nhập</th>
                         <th>Trạng thái</th>
-                        <th>Số lượng</th>
+                        <th>Số lượng hiện tại</th>
                         <th>Chỉnh sửa</th>
                     </tr>
                 </thead>
@@ -43,10 +77,10 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                             <td>'.$row_device['status'].'</td>
                             <td>'.$row_device['total'].'</td>
                             <td>
-                                <button type="button" id="borrowDevice2" class="btn btn-primary" data-toggle="modal" data-target="#borrowDevice"><span class="glyphicon glyphicon-bookmark"></span></button>
+                                <button type="button" data-id="'.$row_device['idDevice'].'" data-toggle="modal" data-target="#borrowDevice" class="btn btn-primary borrowDevice"><span class="glyphicon glyphicon-bookmark"></span></button>
                             </td>
                         </tr>';
-                      }
+                      }//data-toggle="modal" data-target="#borrowDevice"
                   } else {
                       echo '<br><br><div class="alert alert-info">Chưa có thiết bị nào.</div>';
                   }
@@ -75,7 +109,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
         ?>
 
 
-    <div id="borrowDevice" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <!-- <div id="borrowDevice" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
@@ -85,11 +119,53 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                 <div class="modal-body">
                     <p><strong>Vui lòng đăng ký và chờ!</strong></p>
                     <form>
-                        <div class="modal-footer">
-                            <a href="borrow" type="button" class="btn btn-primary">Yes</a>
+                <div class="modal-footer">
+                      <a href="borrow" type="button" class="btn btn-primary">Yes</a>
                             <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
                         </div>
                 </div>
             </div>
         </div>
+    </div> -->
+
+    <div id="borrowDevice" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Đăng ký mượn thiết bị</h4>
+          </div>
+          <div class="modal-body edit-content">
+              <form class="form-group" action="<?php echo $_DOMAIN; ?>device" method="post">
+                <input type="hidden" name="toIdDevice" id="toIdDevice" value=""/>
+                  <fieldset class="form-group">
+                      <label for="toProject">Cho dự án</label>
+                      <select class="form-control" name="toProject" id="toProject">
+                        <?php
+                            //Chọn dự án
+                            $sql_project = "SELECT idProject,nameProject FROM project_info";
+                            foreach ($db->fetch_assoc($sql_project,0) as $key => $data) {
+                              echo '<option value="'.$data['idProject'].'">'.$data['nameProject'].'</option>';
+                            }
+                        ?>
+                      </select>
+                  </fieldset>
+                  <fieldset class="form-group">
+                      <label for="totalBorrow">Số lượng mượn</label>
+                      <input type="number" class="form-control" name="totalBorrow" id="totalBorrow" placeholder="Nhập số lượng">
+                  </fieldset>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" name="newBorrowDevice"class="btn btn-primary">Thêm</button></form>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <script>
+    // using latest bootstrap so, show.bs.modal
+    $('#borrowDevice').on('show.bs.modal', function(e) {
+      var product = $(e.relatedTarget).data('id');
+      $("#toIdDevice").val(product);
+    });
+    </script>

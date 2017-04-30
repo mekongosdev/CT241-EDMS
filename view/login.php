@@ -7,7 +7,7 @@ if(isset($_POST['id_login']) && isset($_POST['pwd_login'])){
 
   //Neu gia tri rong
   if (!$id_user || !$pwd ) {
-        echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+        new Warning('','Vui lòng điền đầy đủ thông tin');
     } else {
         $sql_select_user = "SELECT idUser FROM user_auth WHERE idUser = '$id_user'";
         //Neu ton tai user
@@ -21,20 +21,19 @@ if(isset($_POST['id_login']) && isset($_POST['pwd_login'])){
                       $session->send($id_user);
                       $db->close(); // Giải phóng
 
-                      echo '<div class="alert alert-success">Đăng nhập thành công.</div>';
-                      new Redirect($_DOMAIN); // Trở về trang index
+                      new Success($_DOMAIN,'Đăng nhập thành công'); // Trở về trang index
                   }
                 else {
-                    echo '<div class="alert alert-warning">Tài khoản của bạn đã bị khoá, vui lòng liên hệ quản trị viên để biết thêm thông tin chi tiết.</div>';
+                    new Warning('','Tài khoản của bạn đã bị khoá, vui lòng liên hệ quản trị viên để biết thêm thông tin chi tiết');
                 }
               } else {
-              echo '<div class="alert alert-danger">Mật khẩu không chính xác.</div>';
+                    new Warning('','Mật khẩu không chính xác');
           }
       }
       // Ngược lại không tồn tại username
       else
       {
-          echo '<div class="alert alert-danger">Tên đăng nhập không tồn tại.</div>';
+          new Danger('','Tên đăng nhập không tồn tại');
       }
     }
   }

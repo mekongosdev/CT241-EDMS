@@ -68,7 +68,7 @@
                 </li>
                 <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "partner") echo ' class="active"'; else echo ''; else echo ''; ?>>
                     <a href="<?php echo $_DOMAIN; ?>admin/producer">
-                        <span class="glyphicon glyphicon-list-alt"></span> Quản lý đối tác
+                        <span class="glyphicon glyphicon-list-alt"></span> Quản lý nhà cung cấp/sản xuất
                     </a>
                 </li>
                 <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "images") echo ' class="active"'; else echo ''; else echo ''; ?>>

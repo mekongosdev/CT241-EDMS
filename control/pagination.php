@@ -200,10 +200,12 @@ class Pagination
 //
 // echo $paging->html();
 
-?>
+// echo '<style>
+// /*
+//     li{float:left; margin: 3px; border: solid 1px gray;}
+//     a{padding: 5px;}
+//     span{display:inline-block; padding: 0px 3px; background: blue; color:white }
+// */
+// </style>';
 
-<!--style>
-    li{float:left; margin: 3px; border: solid 1px gray;}
-    a{padding: 5px;}
-    span{display:inline-block; padding: 0px 3px; background: blue; color:white }
-</style-->
+?>

@@ -42,9 +42,10 @@
           if ($user) {
             echo '
             <li';if (isset($_GET["action"])) if ($_GET["action"] == "admin") echo ' class="active">'; else echo '>'; else echo '>'; echo '<a href="'.$_DOMAIN; echo 'admin"><h4><b><span class="glyphicon glyphicon-dashboard"></span> AdminCP</b></h4></a></li>';} ?>
-            <li<?php if (isset($_GET["action"])) if ($_GET["action"] == "profile") echo ' class="active">'; else echo '>'; else echo '>'; ?><a href="<?php echo $_DOMAIN; ?>profile"><h4><b><span class="glyphicon glyphicon-info-sign"></span> Profile</b></h4></a></>
-            <!-- <li><a href="<?php echo $_DOMAIN; ?>#" data-toggle="modal" data-target="#loginForm"><h4><b>Đăng nhập/Đăng ký</b></h4></a></li> -->
-            <li><a href="<?php echo $_DOMAIN; ?>signout"><h4><b><span class="glyphicon glyphicon-log-out"></span> Đăng xuất</b></h4></a></li>
+            <?php if ($user) {
+            echo '<li'; if (isset($_GET["action"])) if ($_GET["action"] == "profile") echo ' class="active">'; else echo '>'; else echo '>'; echo '<a href="'.$_DOMAIN.'profile"><h4><b><span class="glyphicon glyphicon-info-sign"></span> Profile</b></h4></a></>
+            <li><a href="'.$_DOMAIN.'signout"><h4><b><span class="glyphicon glyphicon-log-out"></span> Đăng xuất</b></h4></a></li>';}?>
+            <!-- <li><a href="<?php //echo $_DOMAIN; ?>#" data-toggle="modal" data-target="#loginForm"><h4><b>Đăng nhập/Đăng ký</b></h4></a></li> -->
             <li style="margin-right:10px;"></li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -114,3 +115,12 @@
         </div>
       </div>
     </div>
+
+
+<script type="text/javascript">
+$(document).click(function(e) {
+if (!$(e.target).is('a')) {
+    $('.collapse').collapse('hide');
+  }
+});
+</script>

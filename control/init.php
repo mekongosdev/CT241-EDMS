@@ -19,6 +19,13 @@ $_DOMAIN = 'http://192.168.0.100/demo_ptycpm/';
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 $date_current = '';
 $date_current = date("Y-m-d H:i:sa");
+$day_current = substr($date_current, 8, 2);
+$month_current = substr($date_current, 5, 2);
+$year_current = substr($date_current, 0, 4);
+$hour_current = substr($date_current, 11, 2);
+$minute_current = substr($date_current, 14, 2);
+$second_current = substr($date_current, 17, 2);
+$am_to_pm_current = substr($date_current, 19, 2);
 
 // Khởi tạo session
 $session = new Session();

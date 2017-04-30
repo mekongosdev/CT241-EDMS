@@ -1,10 +1,10 @@
 <a href="#" class="buttonFixed addBrg" data-toggle="modal" data-target="#addProducer"></a>
 
-<table id="infoDevice" class="table table-striped">
+<table id="infoProducer" class="table table-striped">
         <thead>
             <tr>
                 <th>Mã số</th>
-                <th>Đối tác</th>
+                <th>Nhà cung cấp/sản xuất</th>
                 <th>Dịch vụ</th>
                 <th>Điện thoại</th>
                 <th>Email</th>
