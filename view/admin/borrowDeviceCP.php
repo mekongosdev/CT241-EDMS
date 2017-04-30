@@ -1,4 +1,11 @@
+<?php // Nếu chưa đăng nhập
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
 
+<h3>Quản lý mượn thiết bị
+  <a href="<?php echo $_DOMAIN; ?>admin/borrow" class="btn btn-default">
+      <span class="glyphicon glyphicon-repeat"></span> Tải lại
+  </a>
+</h3>
 
 <table id="infoDevice" class="table table-striped">
         <thead>

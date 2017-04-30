@@ -1,4 +1,13 @@
+<?php // Nếu chưa đăng nhập
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
+
 <a href="#" class="buttonFixed addBrg" data-toggle="modal" data-target="#addProducer"></a>
+
+<h3>Quản lý nhà cung cấp/sản xuất</h3>
+  <button class="btn btn-success" data-toggle="modal" data-target="#addProducer">Thêm nhà cung cấp/sản xuất</button>
+  <a href="<?php echo $_DOMAIN; ?>admin/producer" class="btn btn-default">
+      <span class="glyphicon glyphicon-repeat"></span> Tải lại
+  </a>
 
 <table id="infoProducer" class="table table-striped">
         <thead>

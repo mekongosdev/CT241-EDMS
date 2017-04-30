@@ -38,6 +38,63 @@ if (isset($_GET["tab"])) {
             ';
           } else new Redirect($_DOMAIN.'labs');
         } else new Redirect($_DOMAIN.'labs');
+      } else if ($_GET["tab"] == "page") {
+        echo '<div class="row" style="margin-left:30px;margin-right:30px;">
+          <center>';
+    $sql_get_user = "SELECT * FROM lab_info ORDER BY idLab DESC";
+    if ($db->num_rows($sql_get_user)) {
+      $row="SELECT idLab FROM lab_info";
+      $row_per_page=6;
+      $rows=$db->num_rows($row);
+      if ($rows>$row_per_page) $page=ceil($rows/$row_per_page);
+      else $page=1;
+      if(isset($_GET['act']) && (int)$_GET['act'])
+           $start=($_GET['act']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
+      else $start=0;
+      // var_dump($start);
+      $val_lab = "SELECT * FROM lab_info ORDER BY idLab ASC limit $start,$row_per_page";
+
+      foreach ($db->fetch_assoc($val_lab, 0) as $key => $row) {
+        echo '
+        <div class="col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span class="name"><h4><strong>'.$row['nameLab'].'</strong></h4></span>
+            </div>
+            <div class="panel-body">
+              <span>Đơn vị: '.$row['unit'].'</span><br />
+              <span>Điện thoại: <a href="tel:'.$row['phone'].'">'.$row['phone'].'</a></span><br />
+              <span>Địa chỉ: '.$row['address'].'</span><br />
+              <span><a href="'.$_DOMAIN.'labs/info/'.$row['idLab'].'">Xem chi tiết</a></span>
+            </div>
+          </div>
+        </div>';
+      } echo '
+      </center>
+    </div>
+    <div class="container">';
+
+      $row="SELECT idLab FROM lab_info";
+      $rows=$db->num_rows($row);
+      $config = array(
+          'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
+          'total_record'  => $rows, // Tổng số record
+          'limit'         => 6,// limit
+          'link_full'     => $_DOMAIN.'labs/page/{page}',// Link full có dạng như sau: domain/com/page/{page}
+          'link_first'    => $_DOMAIN.'labs',// Link trang đầu tiên
+          'range'         => 3 // Số button trang bạn muốn hiển thị
+      );
+
+      $paging = new Pagination();
+
+      $paging->init($config);
+
+      echo $paging->html();
+
+      echo'</div>';
+    } else {
+        echo '<br><br><div class="alert alert-info">Chưa có Lab nào.</div>';
+    }
       }
     } else {
       echo '<div class="row" style="margin-left:30px;margin-right:30px;">
@@ -45,18 +102,17 @@ if (isset($_GET["tab"])) {
   $sql_get_user = "SELECT * FROM lab_info ORDER BY idLab DESC";
   if ($db->num_rows($sql_get_user)) {
     $row="SELECT idLab FROM lab_info";
-    $row_per_page=10;
+    $row_per_page=6;
     $rows=$db->num_rows($row);
     if ($rows>$row_per_page) $page=ceil($rows/$row_per_page);
     else $page=1;
-    if(isset($_GET['page']) && (int)$_GET['page'])
-         $start=($_GET['page']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
+    if(isset($_GET['act']) && (int)$_GET['act'])
+         $start=($_GET['act']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
     else $start=0;
     // var_dump($start);
-    $val = "SELECT * FROM lab_info ORDER BY idLab ASC limit $start,$row_per_page";
-    $retval = $db->query($val);
+    $val_lab = "SELECT * FROM lab_info ORDER BY idLab ASC limit $start,$row_per_page";
 
-    foreach ($db->fetch_assoc($val, 0) as $key => $row) {
+    foreach ($db->fetch_assoc($val_lab, 0) as $key => $row) {
       echo '
       <div class="col-md-4">
         <div class="panel panel-default">
@@ -73,7 +129,27 @@ if (isset($_GET["tab"])) {
       </div>';
     } echo '
     </center>
-  </div>';
+  </div>
+  <div class="container">';
+
+    $row="SELECT idLab FROM lab_info";
+    $rows=$db->num_rows($row);
+    $config = array(
+        'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
+        'total_record'  => $rows, // Tổng số record
+        'limit'         => 6,// limit
+        'link_full'     => $_DOMAIN.'labs/page/{page}',// Link full có dạng như sau: domain/com/page/{page}
+        'link_first'    => $_DOMAIN.'labs',// Link trang đầu tiên
+        'range'         => 3 // Số button trang bạn muốn hiển thị
+    );
+
+    $paging = new Pagination();
+
+    $paging->init($config);
+
+    echo $paging->html();
+
+    echo'</div>';
   } else {
       echo '<br><br><div class="alert alert-info">Chưa có Lab nào.</div>';
   }

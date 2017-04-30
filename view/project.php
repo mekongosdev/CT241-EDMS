@@ -25,8 +25,8 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
               $rows=$db->num_rows($row);
               if ($rows>$row_per_page) $page=ceil($rows/$row_per_page);
               else $page=1;
-              if(isset($_GET['page']) && (int)$_GET['page'])
-                   $start=($_GET['page']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
+              if(isset($_GET['tab']) && (int)$_GET['tab'])
+                   $start=($_GET['tab']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
               else $start=0;
               // var_dump($start);
               $val = "SELECT *,DATE_FORMAT( dateStart,  '%d/%m/%Y' ) AS date FROM project_info ORDER BY idProject ASC limit $start,$row_per_page";
@@ -53,11 +53,11 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 $row="SELECT idProject FROM project_info";
 $rows=$db->num_rows($row);
 $config = array(
-    'current_page'  => isset($_GET['page']) ? $_GET['page'] : 1, // Trang hiện tại
+    'current_page'  => isset($_GET['tab']) ? $_GET['tab'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => '?action=history&page={page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => '?action=history',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'project/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'project',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -67,3 +67,4 @@ $paging->init($config);
 
 echo $paging->html();
 ?>
+</div>

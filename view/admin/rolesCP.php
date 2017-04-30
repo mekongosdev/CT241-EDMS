@@ -3,6 +3,12 @@
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 ?>
 
+<h3>Quản lý phân quyền thành viên
+  <a href="<?php echo $_DOMAIN; ?>admin/roles" class="btn btn-default">
+      <span class="glyphicon glyphicon-repeat"></span> Tải lại
+  </a>
+</h3>
+
 <?php
   if (isset($_POST['changeRolethisUser'])) {
       $idUser = $_POST['toIdUser'];
@@ -131,7 +137,7 @@ echo $paging->html();
                   <label for="roleChange">Tên quyền</label>
                   <select class="form-control" name="roleChange" id="roleChange">
                     <?php
-                        //Chọn dự án
+                        //Chọn quyền
                         $sql_roles = "SELECT roleName FROM roles_cp";
                         foreach ($db->fetch_assoc($sql_roles,0) as $key => $data) {
                           echo '<option value="'.$data['roleName'].'">'.$data['roleName'].'</option>';
