@@ -46,7 +46,6 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
               else $start=0;
               // var_dump($start);
               $val = "SELECT * FROM user_info ORDER BY idUser ASC limit $start,$row_per_page";
-              $retval = $db->query($val);
 
               foreach ($db->fetch_assoc($val, 0) as $key => $row) {
                 echo '

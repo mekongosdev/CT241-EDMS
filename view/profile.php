@@ -34,14 +34,25 @@ else {
               </div>
               <div class="col-sm-4">
                 <br />
-                <a href="#" data-toggle="modal" data-target="#changeAvatar">Chỉnh sửa</a><br  />
-                <a href="#">Xóa avatar</a>
+                <?php if (isset($_GET['tab'])) {
+                  if ($_GET['tab'] == $user) {
+                    echo '<a data-toggle="modal" data-target="#changeAvatar">Chỉnh sửa</a><br  />
+                    <a href="'.$_DOMAIN.'profile/'.$data_user_profile['idUser'].'/delAvatar" name="delAvatar">Xóa avatar</a>';
+                  }
+                } else echo '<a data-toggle="modal" data-target="#changeAvatar">Chỉnh sửa</a><br  />
+                <a href="'.$_DOMAIN.'profile/'.$data_user_profile['idUser'].'/delAvatar" name="delAvatar">Xóa avatar</a>';?>
               </div>
             </center>
         </div>
         <div class="col-sm-6 profile-info">
             <div class="divider"></div>
-            <p><strong>Thông tin nghiên cứu </strong><a href="#" data-toggle="modal" data-target="#changeResearch">Chỉnh sửa</a></p>
+            <p><strong>Thông tin nghiên cứu </strong>
+              <?php if (isset($_GET['tab'])) {
+                if ($_GET['tab'] == $user) {
+                  echo '<a href="#" data-toggle="modal" data-target="#changeResearch">Chỉnh sửa</a>';
+                }
+              } else echo '<a href="#" data-toggle="modal" data-target="#changeResearch">Chỉnh sửa</a>';?>
+            </p>
             <span><strong><?php echo $data_user_profile['position']; ?></strong></span><br  />
             <span><strong>Trình độ: </strong><?php echo $data_user_profile['level']; ?></span><br  />
             <span><strong>Đơn vị: </strong><?php echo $data_user_profile['unit']; ?></span><br  />
@@ -49,7 +60,13 @@ else {
         </div>
         <div class="col-sm-6 profile-info">
             <div class="divider"></div>
-            <p><strong>Thông tin cá nhân </strong><a href="#" data-toggle="modal" data-target="#changeInfomation">Chỉnh sửa</a></p>
+            <p><strong>Thông tin cá nhân </strong>
+              <?php if (isset($_GET['tab'])) {
+                if ($_GET['tab'] == $user) {
+                  echo '<a href="#" data-toggle="modal" data-target="#changeInfomation">Chỉnh sửa</a>';
+                }
+              } else echo '<a href="#" data-toggle="modal" data-target="#changeInfomation">Chỉnh sửa</a>';?>
+            </p>
             <span><strong><?php echo $data_user_profile['fullName']; ?></strong></span><br  />
             <span><strong>Mã số: </strong><?php echo $data_user_profile['idUser']; ?></span><br  />
             <span><strong>Điện thoại: </strong><?php echo $data_user_profile['phone']; ?></span><br  />
@@ -57,8 +74,18 @@ else {
         </div>
         <div class="col-sm-6 profile-info">
             <div class="divider"></div>
-            <p><strong>Thông tin khác </strong><a href="#" data-toggle="modal" data-target="#changeOther">Chỉnh sửa</a></p>
-            <span><strong>Mật khẩu: </strong><a href="#" data-toggle="modal" data-target="#changePass">Thay đổi</a></span><br  />
+            <p><strong>Thông tin khác </strong>
+              <?php if (isset($_GET['tab'])) {
+                if ($_GET['tab'] == $user) {
+                  echo '<a href="#" data-toggle="modal" data-target="#changeOther">Chỉnh sửa</a>';
+                }
+              } else echo '<a href="#" data-toggle="modal" data-target="#changeOther">Chỉnh sửa</a>';?>
+             </p>
+              <?php if (isset($_GET['tab'])) {
+                if ($_GET['tab'] == $user) {
+                  echo '<span><strong>Mật khẩu: </strong><a href="#" data-toggle="modal" data-target="#changePass">Thay đổi</a></span><br  />';
+                }
+              } else echo '<a href="#" data-toggle="modal" data-target="#changePass">Thay đổi</a></span><br  />';?>
             <span><strong>Website: </strong><i><?php echo $data_user_profile['website']; ?></i></span><br  />
             <span><strong>Mạng xã hội: </strong><i><?php echo $data_user_profile['social']; ?></i></span><br  />
             <span><strong>Địa chỉ: </strong><?php echo $data_user_profile['address']; ?></span>
@@ -251,7 +278,7 @@ else {
         $size_img = $_FILES['img_up']['size'][$name]; // Dung lượng file
 
         if ($size_img > 5242880){
-            echo "File không được lớn hơn 5MB";
+            new Warning($_DOMAIN.'profile','File không được lớn hơn 5MB');
         } else {
             // Upload file
             $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
@@ -269,10 +296,23 @@ else {
             $sql_change_avatar = "UPDATE user_info SET idImg = '$idImg' WHERE idUser = '$id'";
             $db->query($sql_change_avatar);
             // echo '<div class="alert alert-success">File Uploaded</div>';
-            new Redirect($_DOMAIN.'profile');
+            new Success($_DOMAIN.'profile','Thay đổi avatar thành công');
             }
           }
         }
+
+//Xử lý xóa avatar
+if (isset($_GET['tab'])) {
+  if ($_GET['tab'] == $user) {
+    if (isset($_GET['act'])) {
+      if ($_GET['act'] == 'delAvatar') {
+        $sql_del_avatar = "UPDATE user_info SET idImg = 1 WHERE idUser = '$id'";
+        $db->query($sql_del_avatar);
+        new Success($_DOMAIN.'profile','Xóa avatar thành công');
+      } else new Warning($_DOMAIN.'profile','Có lỗi xảy ra! Vui lòng kiểm tra lại');
+    } else new Redirect($_DOMAIN.'profile');
+  } else new Warning('','Bạn không có quyền thay đổi thông tin người dùng khác');
+}
 
 //Xử lý thông tin nghiên cứu
 if (isset($_POST['changeResearch'])) {
@@ -283,8 +323,8 @@ if (isset($_POST['changeResearch'])) {
   if ($position && $level && $unit) {
     $sql_change_research = "UPDATE user_info SET position='$position',level='$level',unit='$unit' WHERE idUser = '$id'";
     $db->query($sql_change_research);
-    new Redirect($_DOMAIN.'profile');
-  } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+    new Success($_DOMAIN.'profile');
+  } else new Warning($_DOMAIN.'profile','Vui lòng điền đầy đủ thông tin');
 }
 //Xử lý thông tin cá nhân
 if (isset($_POST['changeInfomation'])) {
@@ -296,8 +336,8 @@ if (isset($_POST['changeInfomation'])) {
   if ($name && $id_number && $phone && $email) {
     $sql_change_info = "UPDATE user_info SET fullName='$name',idUser='$id_number',phone='$phone',email='$email' WHERE idUser = '$id'";
     $db->query($sql_change_info);
-    new Redirect($_DOMAIN.'profile');
-  } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+    new Success($_DOMAIN.'profile');
+  } else new Warning($_DOMAIN.'profile','Vui lòng điền đầy đủ thông tin');
 }
 //Xử lý thông tin khác
 if (isset($_POST['changeOther'])) {
@@ -308,8 +348,8 @@ if (isset($_POST['changeOther'])) {
   if ($website && $social && $address) {
     $sql_change_other = "UPDATE user_info SET website='$website',social='$social',address='$address' WHERE idUser = '$id'";
     $db->query($sql_change_other);
-    new Redirect($_DOMAIN.'profile');
-  } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+    new Success($_DOMAIN.'profile');
+  } else new Warning($_DOMAIN.'profile','Vui lòng điền đầy đủ thông tin');
 }
 //Xử lý đổi mật khẩu
 if (isset($_POST['changePass'])) {
@@ -320,9 +360,9 @@ if (isset($_POST['changePass'])) {
     if ($new_pass == $re_pass ) {
       $sql_change_pass = "UPDATE user_auth SET pwd='$new_pass' WHERE idUser = '$id'";
       $db->query($sql_change_pass);
-      new Redirect($_DOMAIN.'profile');
-    } else echo '<div class="alert alert-warning">Mật khẩu không khớp</div>';
-  } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+      new Success($_DOMAIN.'profile');
+    } else new Warning($_DOMAIN.'profile','Mật khẩu không khớp');
+  } else new Warning($_DOMAIN.'profile','Vui lòng điền đầy đủ thông tin');
 }
 
 ?>

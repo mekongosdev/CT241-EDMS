@@ -22,8 +22,7 @@ if(isset($_POST['id_login']) && isset($_POST['pwd_login'])){
                       $db->close(); // Giải phóng
 
                       new Success($_DOMAIN,'Đăng nhập thành công'); // Trở về trang index
-                  }
-                else {
+                } else {
                     new Warning('','Tài khoản của bạn đã bị khoá, vui lòng liên hệ quản trị viên để biết thêm thông tin chi tiết');
                 }
               } else {

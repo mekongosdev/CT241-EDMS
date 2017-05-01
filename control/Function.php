@@ -17,14 +17,21 @@ class Redirect {
 
 // Hàm làm mới trang
 class Reload {
-    public function __construct($url = null) {
-        if ($url)
-        {
+    public function __construct($url = null,$time = null) {
+        if ($url) {
+          if ($time) {
             echo '<script type="text/javascript">
             setTimeout(function () {
                window.location.href = "'.$url.'"; //will redirect to your blog page (an ex: blog.html)
-            }, 2000); //will call the function after 2 secs.
+            }, '.$time.'000); //will call the function after $time secs.
             </script>';
+          } else {
+              echo '<script type="text/javascript">
+              setTimeout(function () {
+                 window.location.href = "'.$url.'"; //will redirect to your blog page (an ex: blog.html)
+              }, 2000); //will call the function after 2 secs.
+              </script>';
+          }
         }
     }
 }

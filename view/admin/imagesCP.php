@@ -2,35 +2,7 @@
 <?php
 
 // Nếu chưa đăng nhập
-if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
-
-//
-// // Nếu đăng nhập
-// if ($user)
-// {
-//
-//     echo '<h3>Hình ảnh</h3>';
-//     // Lấy tham số ac
-//     if (isset($_GET['ac']))
-//     {
-//         $ac = trim(addslashes(htmlspecialchars($_GET['ac'])));
-//     }
-//     else
-//     {
-//         $ac = '';
-//     }
-//
-//
-//     // Nếu có tham số ac
-//     if ($ac != '')
-//     {
-//         // Trang upload hình ảnh
-//         if ($ac == 'add')
-//         {
-//             // Dãy nút của upload hình ảnh
-//             echo
-//             '';
-?>
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
         <h3>Hình ảnh</h3>
             <a class="btn btn-default" data-toggle="modal" data-target="#addNewPhoto">
                 <span class="glyphicon glyphicon-plus"></span> Thêm
@@ -48,7 +20,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
           if ($db->num_rows($sql_get_images))
           {
               $row="SELECT idImg FROM images";
-              $row_per_page=10;
+              $row_per_page=12;
               $rows=$db->num_rows($row);
               if ($rows>$row_per_page) $page=ceil($rows/$row_per_page);
               else $page=1;
@@ -133,7 +105,7 @@ $rows=$db->num_rows($row);
 $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
-    'limit'         => 10,// limit
+    'limit'         => 12,// limit
     'link_full'     => $_DOMAIN.'admin/images/{page}',// Link full có dạng như sau: domain/com/page/{page}
     'link_first'    => $_DOMAIN.'admin/images',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
@@ -241,7 +213,7 @@ if (isset($_POST['act']))
       </div>
       <div class="modal-body">
         <div class="alert alert-info">Mỗi file có dung lượng không vượt quá 10MB và có đuôi định dạng là .jpg, .png.gif., </div>
-        <form method="post" action="#" class="form-group" id="formUpImg" enctype="multipart/form-data">
+        <form method="post" action="<?php echo $_DOMAIN; ?>admin/images" class="form-group" id="formUpImg" enctype="multipart/form-data">
                 <div class="form-group">
                   <label>Chọn hình ảnh</label>
                   <input type="file" class="form-control" accept="image/*" name="img_up[]" multiple="true" id="img_up_sc" onchange="preUpImg();"/>

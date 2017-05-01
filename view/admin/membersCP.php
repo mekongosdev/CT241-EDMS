@@ -33,7 +33,6 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
               else $start=0;
               // var_dump($start);
               $val = "SELECT * FROM user_info ORDER BY idUser ASC limit $start,$row_per_page";
-              $retval = $db->query($val);
 
               foreach ($db->fetch_assoc($val, 0) as $key => $row) {
                 echo '<tr>
@@ -42,7 +41,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
                     <td><a href="tel:'.$row['phone'].'">'.$row['phone'].'</td>
                     <td><a href="mailto:'.$row['email'].'">'.$row['email'].'</td>
                     <td>
-                        <button type="button" id="editMembers" class="btn btn-primary" data-toggle="modal" data-target="#editMember"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" id="editMembers" class="btn btn-primary" data-id="'.$row['idUser'].'" data-toggle="modal" data-target="#editMember"><span class="glyphicon glyphicon-pencil"></span></button>
                     </td>
                 </tr>';
               }
@@ -74,6 +73,31 @@ echo $paging->html();
 ?>
 </div>
 
+<?php
+//Lấy idUser mới nhất
+$sql_query_new_id_acc = "SELECT idUser FROM user_auth ORDER BY dateCreate DESC";
+foreach ($db->fetch_assoc($sql_query_new_id_acc,1) as $key => $data) {
+  $idAcc = $data;
+}
+
+//Lấy email của idUser mới nhất
+$sql_query_new_id_acc = "SELECT email FROM user_auth WHERE idUser = '$idAcc'";
+foreach ($db->fetch_assoc($sql_query_new_id_acc,1) as $key => $data) {
+  $newEmail = $data;
+}
+
+//Truy vấn idUser và email mới nhất
+$sql_query_new_member = "SELECT * FROM user_auth INNER JOIN user_info ON user_auth.idUser = user_info.idUser WHERE user_auth.idUser = '$idAcc'";
+if (!$db->num_rows($sql_query_new_member)) {
+  $idNewUser = $idAcc;
+  $newUserEmail = $newEmail;
+} else {
+  $idNewUser = '';
+  $newUserEmail = '';
+}
+?>
+
+<!-- Thêm thành viên -->
     <div id="addMember" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -89,7 +113,7 @@ echo $paging->html();
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="idMember">MSCB/MSSV</label>
-                            <input type="text" class="form-control" name="idMember" id="idMember" placeholder="Nhập mã số thành viên">
+                            <input type="text" class="form-control" name="idMember" id="idMember" placeholder="Nhập mã số thành viên" value="<?php echo $idNewUser;?>">
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="phoneMember">Điện thoại</label>
@@ -97,7 +121,7 @@ echo $paging->html();
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="mailMember">Email</label>
-                            <input type="mail" class="form-control" name="mailMember" id="mailMember" placeholder="Nhập email thành viên">
+                            <input type="mail" class="form-control" name="mailMember" id="mailMember" placeholder="Nhập email thành viên" value="<?php echo $newUserEmail;?>">
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="positionMember">Vị trí nghiên cứu</label>
@@ -111,14 +135,9 @@ echo $paging->html();
                             <label for="typeMember">Phân loại</label>
                             <select class="form-control" name="typeMember" id="typeMember">
                               <option value="1">Cán bộ</option>
-                              <option value="0">Sinh viên</option>
+                              <option value="0">Sinh viên/Học viên</option>
                             </select>
                         </fieldset>
-                        <!-- <fieldset class="form-group">
-                            <label for="pictureMember">Hình ảnh</label>
-                            <input type="file" class="form-control-file" name="pictureMember" id="pictureMember">
-                            <small class="text-muted">Ảnh được chọn phải nhỏ hơn 5MB. Định dạng hỗ trợ: jpeg/jpg, png, gif.</small>
-                        </fieldset> -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
@@ -128,6 +147,7 @@ echo $paging->html();
         </div>
     </div>
 
+<!-- Chỉnh sửa thành viên -->
     <div id="editMember" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -136,7 +156,8 @@ echo $paging->html();
                     <h4 class="modal-title" id="">Chỉnh sửa thông tin</h4>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form action="<?php echo $_DOMAIN; ?>admin/members" method="post">
+                      <input type="hidden" name="toEditMember" id="toEditMember" value=""/>
                       <fieldset class="form-group">
                           <label for="nameMember">Họ tên</label>
                           <input type="text" class="form-control" name="nameMember" id="nameMember" placeholder="Nhập tên thành viên">
@@ -162,14 +183,16 @@ echo $paging->html();
                           <input type="text" class="form-control" name="levelMember" id="levelMember" placeholder="Nhập trình độ học vấn của thành viên">
                       </fieldset>
                       <fieldset class="form-group">
-                          <label for="pictureMember">Hình ảnh</label>
-                          <input type="file" class="form-control-file" name="pictureMember" id="pictureMember">
-                          <small class="text-muted">Ảnh được chọn phải nhỏ hơn 5MB. Định dạng hỗ trợ: jpeg/jpg, png, gif.</small>
+                          <label for="typeMember">Phân loại</label>
+                          <select class="form-control" name="typeMember" id="typeMember">
+                            <option value="1">Cán bộ</option>
+                            <option value="0">Sinh viên/Học viên</option>
+                          </select>
                       </fieldset>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteMember">Delete</button>
+                    <button type="button" name="editMember" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-id="'.$row['idUser'].'" data-toggle="modal" data-target="#deleteMember">Delete</button>
                     <button type="submit" class="btn btn-primary">Submit</button></form>
                 </div>
             </div>
@@ -186,15 +209,31 @@ echo $paging->html();
                 </div>
                 <div class="modal-body">
                     <h3>Bạn có muốn tiếp tục?</h3>
-                    <form>
+                    <form action="<?php echo $_DOMAIN; ?>admin/members" method="post">
                         <div class="modal-footer">
-                            <a href="delete" type="button" class="btn btn-danger">Yes</a>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                            <input type="hidden" name="toDelMember" id="toDelMember" value=""/>
+                            <button type="submit" name="delMember" class="btn btn-primary">Đồng ý</button></form>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Không</button>
                         </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- JS Function -->
+    <script language="JavaScript">
+    // using latest bootstrap so, show.bs.modal
+    //editMember
+    $('#editMember').on('show.bs.modal', function(e) {
+      var product = $(e.relatedTarget).data('id');
+      $("#toEditMember").val(product);
+    });
+    //delMember
+    $('#deleteMember').on('show.bs.modal', function(e) {
+      var product = $(e.relatedTarget).data('id');
+      $("#toDelMember").val(product);
+    });
+    </script>
 
 <?php
 //Xử lý thêm thành viên
@@ -207,10 +246,10 @@ if (isset($_POST['addNewMember'])) {
   $level = $_POST['levelMember'];
   $type = $_POST['typeMember'];
 
-  if ($name && $idUser && $phone && $email && $position && $level && $type) {
-      $sql_add_user = "INSERT INTO user_info(idUser, idImg, fullName, phone, email, website, social, address, position, level, unit,type) VALUES ('$idUser','','$name','$phone','$email','không có','không có','ĐH Cần Thơ','$position','$level','Khoa CNTT&TT','$type')";
+  if ($name && $idUser && $phone && $email && $position && $level) {
+      $sql_add_user = "INSERT INTO user_info(idUser,idImg,fullName,phone,email,website,social,address,position,level,unit,type) VALUES ('$idUser',1,'$name','$phone','$email','không có','không có','ĐH Cần Thơ','$position','$level','Khoa CNTT&TT','$type')";
       $db->query($sql_add_user);
-      new Redirect($_DOMAIN.'admin/account/add');
-  } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+      new Success($_DOMAIN.'admin/account/');
+  } else new Warning($_DOMAIN.'admin/members','Vui lòng điền đầy đủ thông tin');
 }
 ?>
