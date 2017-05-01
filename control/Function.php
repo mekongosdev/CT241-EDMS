@@ -168,4 +168,26 @@ class Info {
     }
 }
 
+// Hàm mã hóa
+// class Hash_Encrypt {
+//     public function __construct($text = null) {
+//         if ($text)
+//         {
+//             $key = "7f954d00890af2c2c954d00890af2c21b17d6489c15e5be712fff271b1715e5be712fff271b17d6489";
+//             $hsh = $key.$text.$key;
+//             return $hsh;
+//             // echo md5($hsh);
+//         }
+//     }
+// }
+
+Function Hash_Encrypt($text) {
+  if ($text)
+  {
+      $key = "7f954d00890af2c2c954d00890af2c21b17d6489c15e5be712fff271b1715e5be712fff271b17d6489";
+      $hsh = $key.$text.$key;
+      return md5($hsh);
+  }
+}
+
 ?>

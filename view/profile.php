@@ -56,7 +56,18 @@ else {
             <span><strong><?php echo $data_user_profile['position']; ?></strong></span><br  />
             <span><strong>Trình độ: </strong><?php echo $data_user_profile['level']; ?></span><br  />
             <span><strong>Đơn vị: </strong><?php echo $data_user_profile['unit']; ?></span><br  />
-            <span><a href="#">Các dự án đang tham gia: <span class="badge">4</span></a></span>
+            <?php $name = $data_user_profile['fullName'];
+            $sql_get_project = "SELECT * FROM project_info WHERE nameUser = '$name'";
+            $total_project = $db->num_rows($sql_get_project);
+            foreach ($db->fetch_assoc($sql_get_project, 0) as $key => $value_lab) {
+              $url_lab = $_DOMAIN.'labs/info/'.$value_lab['idLab'];
+            }
+            if ($value_lab['idLab'] != 0) {
+              echo '
+              <span><a href="'.$url_lab.'">Các dự án đang tham gia: <span class="badge">'.$total_project.'</span></a></span>';
+            } else echo '
+            <span>Các dự án đang tham gia: <span class="badge">'.$total_project.'</span></span>';
+            ?>
         </div>
         <div class="col-sm-6 profile-info">
             <div class="divider"></div>

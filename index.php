@@ -42,6 +42,9 @@ if (isset($_GET["action"])) {
       } else if ($_GET["action"] == "login") {
         //Chèn trang dang nhap
         include("view/login.php");
+      } else if ($_GET["action"] == "user_url") {
+        //Chèn trang login theo url
+        include("view/user_url.php");
       } else if ($_GET["action"] == "signout") {
         //Dang xuat khoi tai khoan hien huu
         // new Redirect($_DOMAIN);

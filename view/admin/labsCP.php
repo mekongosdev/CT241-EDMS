@@ -41,12 +41,15 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
               foreach ($db->fetch_assoc($val, 0) as $key => $row) {
                 echo '<tr>
                     <td>'.$row['idLab'].'</td>
-                    <td>'.$row['nameLab'].'</td>
+                    <td><a href="'.$_DOMAIN.'labs/info/'.$row['idLab'].'">'.$row['nameLab'].'</a></td>
                     <td>'.$row['unit'].'</td>
                     <td>'.$row['phone'].'</td>
                     <td>'.$row['address'].'</td>
                     <td><a href="'.$row['location'].'">'.$row['location'].'</a></td>
-                    <td><a href="" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                    <td>
+                        <button type="button" id="editLab" class="btn btn-primary" data-id="'.$row['idLab'].'" data-name="'.$row['nameLab'].'" data-unit="'.$row['unit'].'" data-phone="'.$row['phone'].'" data-address="'.$row['address'].'" data-location="'.$row['location'].'" data-toggle="modal" data-target="#editThisLab"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" id="delLab" class="btn btn-danger" data-id="'.$row['idLab'].'" data-toggle="modal" data-target="#deleteLab"><span class="glyphicon glyphicon-trash"></span></button>
+                    </td>
                 </tr>';
               }
           } else {
@@ -76,7 +79,7 @@ $paging->init($config);
 echo $paging->html();
 ?>
 
-
+    <!-- Thêm Lab -->
     <div id="addProject" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -115,75 +118,94 @@ echo $paging->html();
         </div>
     </div>
 
-    <!-- <div id="editProject" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <!-- Chỉnh sửa Lab -->
+    <div id="editThisLab" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Chỉnh sửa dự án</h4>
+                    <h4 class="modal-title">Chỉnh sửa Lab</h4>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form action="<?php echo $_DOMAIN; ?>admin/labs" method="post">
+                      <input type="hidden" name="toEditLab" id="toEditLab" value=""/>
                       <fieldset class="form-group">
-                          <label for="projectName">Tên dự án</label>
-                          <input type="text" class="form-control" name="projectName" id="projectName" placeholder="Nhập tên dự án">
+                          <label for="labName">Tên Lab</label>
+                          <input type="text" class="form-control" name="labName" id="thislabName" value="" placeholder="Nhập tên Lab">
                       </fieldset>
                       <fieldset class="form-group">
-                          <label for="projectOwn">Chủ nhiệm</label>
-                          <select class="form-control" name="projectOwn" id="projectOwn">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                          </select>
+                          <label for="labUnit">Đơn vị</label>
+                          <input type="text" class="form-control" name="labUnit" id="thislabUnit" value="" placeholder="Nhập tên đơn vị">
                       </fieldset>
                       <fieldset class="form-group">
-                          <label for="projectGuide">Hướng dẫn</label>
-                          <select class="form-control" name="projectGuide" id="projectGuide">
-                            <option>Tự nghiên cứu</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                          </select>
-                          <small class="text-muted">Nếu tự nghiên cứu, chọn Tự nghiên cứu</i></small>
+                          <label for="labPhone">Điện thoại</label>
+                          <input type="text" class="form-control" name="labPhone" id="thislabPhone" value="" placeholder="Nhập số điện thoại">
                       </fieldset>
                       <fieldset class="form-group">
-                          <label for="projectStart">Khởi động từ</label>
-                          <input type="date" class="form-control" name="projectStart" id="projectStart" placeholder="Nhập ngày bắt đầu">
+                          <label for="labAddress">Địa chỉ</label>
+                          <input type="text" class="form-control" name="labAddress" id="thislabAddress" value="" placeholder="Nhập địa chỉ">
+                      </fieldset>
+                      <fieldset class="form-group">
+                          <label for="labMap">URL Google Map</label>
+                          <input type="text" class="form-control" name="labMap" id="thislabMap" value="" placeholder="Nhập địa chỉ URL từ Google Map">
                       </fieldset>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteProject">Xóa</button>
-                    <button type="submit" class="btn btn-primary">Đồng ý</button></form>
+                    <button type="submit" name="editInfoLab"class="btn btn-primary">Thêm</button></form>
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
-
-
-    <!-- <div id="deleteProject" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <!-- Xóa Lab -->
+    <div id="deleteLab" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Bạn đang xóa dự án!</h4>
+                    <h4 class="modal-title" id="">Xóa thành viên!</h4>
                 </div>
                 <div class="modal-body">
-                    <h3>Bạn có muốn tiếp tục?</h3>
-                    <form>
+                  <center>
+                    <h4>Hành động này cần xác nhận: Không thể hoàn tác!</h4>
+                    <p>Vui lòng kiểm tra cẩn thận!</p>
+                  </center>
+                    <form action="<?php echo $_DOMAIN; ?>admin/labs" method="post">
                         <div class="modal-footer">
-                            <a href="delete" type="button" class="btn btn-danger">Yes</a>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                            <input type="hidden" name="toDelLab" id="toDelLab" value=""/>
+                            <button type="submit" name="delLab" class="btn btn-danger">Đồng ý</button></form>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Không</button>
                         </div>
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
+    <!-- JS Function -->
+    <script language="JavaScript">
+    // using latest bootstrap so, show.bs.modal
+    //editMember
+    $('#editThisLab').on('show.bs.modal', function(e) {
+      var id = $(e.relatedTarget).data('id');
+      $("#toEditLab").val(id);
+      var name = $(e.relatedTarget).data('name');
+      $("#thislabName").val(name);
+      var unit = $(e.relatedTarget).data('unit');
+      $("#thislabUnit").val(unit);
+      var phone = $(e.relatedTarget).data('phone');
+      $("#thislabPhone").val(phone);
+      var address = $(e.relatedTarget).data('address');
+      $("#thislabAddress").val(address);
+      var location = $(e.relatedTarget).data('location');
+      $("#thislabMap").val(location);
+    });
+    //delMember
+    $('#deleteLab').on('show.bs.modal', function(e) {
+      var product = $(e.relatedTarget).data('id');
+      $("#toDelLab").val(product);
+    });
+    </script>
 
 <?php
 //Thêm lab
@@ -200,5 +222,29 @@ echo $paging->html();
          $query = $db->query($sql);
          new Redirect($_DOMAIN.'admin/labs');
       } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+    }
+    //Xử lý sửa thông tin Lab
+    if (isset($_POST['editInfoLab'])) {
+      $idLab = $_POST['toEditLab'];
+      $name = $_POST['labName'];
+      $unit = $_POST['labUnit'];
+      $phone = $_POST['labPhone'];
+      $address = $_POST['labAddress'];
+      $location = $_POST['labMap'];
+
+      if ($name && $unit && $phone && $address) {
+          $sql_edit_lab = "UPDATE lab_info SET nameLab = '$name',unit = '$unit',phone = '$phone',address = '$address',location = '$location' WHERE idLab = '$idLab'";
+          $db->query($sql_edit_lab);
+          new Success($_DOMAIN.'admin/labs/');
+      } else new Warning($_DOMAIN.'admin/labs','Vui lòng điền đầy đủ thông tin');
+    }
+
+    //Xử lý xóa Lab
+    if (isset($_POST['delLab'])) {
+      $idLab = $_POST['toDelLab'];
+
+      $sql_del_lab = "DELETE FROM lab_info WHERE idLab = '$idLab'";
+      $db->query($sql_del_lab);
+      new Success($_DOMAIN.'admin/labs/');
     }
 ?>

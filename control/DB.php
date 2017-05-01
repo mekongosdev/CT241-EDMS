@@ -37,7 +37,7 @@ class DB
     }
 
     // Hàm đếm số hàng
-    public function num_rows($sql = null)
+    public function num_rows($sql = null) 
     {
         if ($this->cn)
         {

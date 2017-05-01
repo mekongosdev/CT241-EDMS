@@ -41,7 +41,8 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
                     <td><a href="tel:'.$row['phone'].'">'.$row['phone'].'</td>
                     <td><a href="mailto:'.$row['email'].'">'.$row['email'].'</td>
                     <td>
-                        <button type="button" id="editMembers" class="btn btn-primary" data-id="'.$row['idUser'].'" data-toggle="modal" data-target="#editMember"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" id="editMembers" class="btn btn-primary" data-id="'.$row['idUser'].'" data-unit="'.$row['unit'].'" data-position="'.$row['position'].'" data-level="'.$row['level'].'" data-toggle="modal" data-target="#editMember"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" id="delMembers" class="btn btn-danger" data-id="'.$row['idUser'].'" data-toggle="modal" data-target="#deleteMember"><span class="glyphicon glyphicon-trash"></span></button>
                     </td>
                 </tr>';
               }
@@ -159,41 +160,28 @@ if (!$db->num_rows($sql_query_new_member)) {
                     <form action="<?php echo $_DOMAIN; ?>admin/members" method="post">
                       <input type="hidden" name="toEditMember" id="toEditMember" value=""/>
                       <fieldset class="form-group">
-                          <label for="nameMember">Họ tên</label>
-                          <input type="text" class="form-control" name="nameMember" id="nameMember" placeholder="Nhập tên thành viên">
-                      </fieldset>
-                      <fieldset class="form-group">
-                          <label for="idMember">MSCB/MSSV</label>
-                          <input type="text" class="form-control" name="idMember" id="idMember" placeholder="Nhập mã số thành viên">
-                      </fieldset>
-                      <fieldset class="form-group">
-                          <label for="phoneMember">Điện thoại</label>
-                          <input type="number" class="form-control" name="phoneMember" id="phoneMember" placeholder="Nhập số điện thoại">
-                      </fieldset>
-                      <fieldset class="form-group">
-                          <label for="mailMember">Email</label>
-                          <input type="mail" class="form-control" name="mailMember" id="mailMember" placeholder="Nhập email thành viên">
-                      </fieldset>
-                      <fieldset class="form-group">
                           <label for="positionMember">Vị trí nghiên cứu</label>
-                          <input type="text" class="form-control" name="positionMember" id="positionMember" placeholder="Nhập vị trí nghiên cứu của thành viên">
+                          <input type="text" class="form-control" name="positionMember" id="toPositionMember" value="" placeholder="Nhập vị trí nghiên cứu của thành viên">
+                      </fieldset>
+                      <fieldset class="form-group">
+                          <label for="unitMember">Đơn vị công tác</label>
+                          <input type="text" class="form-control" name="unitMember" id="toUnitMember" value="" placeholder="Nhập đơn vị của thành viên">
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="levelMember">Trình độ học vấn</label>
-                          <input type="text" class="form-control" name="levelMember" id="levelMember" placeholder="Nhập trình độ học vấn của thành viên">
+                          <input type="text" class="form-control" name="levelMember" id="toLevelMember" value="" placeholder="Nhập trình độ học vấn của thành viên">
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="typeMember">Phân loại</label>
-                          <select class="form-control" name="typeMember" id="typeMember">
+                          <select class="form-control" name="typeMember" id="toTypeMember">
                             <option value="1">Cán bộ</option>
                             <option value="0">Sinh viên/Học viên</option>
                           </select>
                       </fieldset>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" name="editMember" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-id="'.$row['idUser'].'" data-toggle="modal" data-target="#deleteMember">Delete</button>
-                    <button type="submit" class="btn btn-primary">Submit</button></form>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" name="editInfoMember" class="btn btn-primary">Submit</button></form>
                 </div>
             </div>
         </div>
@@ -205,14 +193,17 @@ if (!$db->num_rows($sql_query_new_member)) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Bạn đang xóa thành viên!</h4>
+                    <h4 class="modal-title" id="">Xóa thành viên!</h4>
                 </div>
                 <div class="modal-body">
-                    <h3>Bạn có muốn tiếp tục?</h3>
+                  <center>
+                    <h4>Hành động này cần xác nhận: Không thể hoàn tác!</h4>
+                    <p>Vui lòng kiểm tra cẩn thận!</p>
+                  </center>
                     <form action="<?php echo $_DOMAIN; ?>admin/members" method="post">
                         <div class="modal-footer">
                             <input type="hidden" name="toDelMember" id="toDelMember" value=""/>
-                            <button type="submit" name="delMember" class="btn btn-primary">Đồng ý</button></form>
+                            <button type="submit" name="delMember" class="btn btn-danger">Đồng ý</button></form>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Không</button>
                         </div>
                 </div>
@@ -227,6 +218,12 @@ if (!$db->num_rows($sql_query_new_member)) {
     $('#editMember').on('show.bs.modal', function(e) {
       var product = $(e.relatedTarget).data('id');
       $("#toEditMember").val(product);
+      var position = $(e.relatedTarget).data('position');
+      $("#toPositionMember").val(position);
+      var unit = $(e.relatedTarget).data('unit');
+      $("#toUnitMember").val(unit);
+      var level = $(e.relatedTarget).data('level');
+      $("#toLevelMember").val(level);
     });
     //delMember
     $('#deleteMember').on('show.bs.modal', function(e) {
@@ -251,5 +248,29 @@ if (isset($_POST['addNewMember'])) {
       $db->query($sql_add_user);
       new Success($_DOMAIN.'admin/account/');
   } else new Warning($_DOMAIN.'admin/members','Vui lòng điền đầy đủ thông tin');
+}
+
+//Xử lý sửa thông tin thành viên
+if (isset($_POST['editInfoMember'])) {
+  $idUser = $_POST['toEditMember'];
+  $position = $_POST['positionMember'];
+  $level = $_POST['levelMember'];
+  $unit = $_POST['unitMember'];
+  $type = $_POST['typeMember'];
+
+  if ($position && $level && $unit) {
+      $sql_edit_user = "UPDATE user_info SET position = '$position',level = '$level',unit = '$unit',type = '$type' WHERE idUser = '$idUser'";
+      $db->query($sql_edit_user);
+      new Success($_DOMAIN.'admin/members/');
+  } else new Warning($_DOMAIN.'admin/members','Vui lòng điền đầy đủ thông tin');
+}
+
+//Xử lý xóa thành viên
+if (isset($_POST['delMember'])) {
+  $idUser = $_POST['toDelMember'];
+
+  $sql_del_user = "DELETE FROM user_info WHERE idUser = '$idUser'";
+  $db->query($sql_del_user);
+  new Success($_DOMAIN.'admin/members/');
 }
 ?>

@@ -1,7 +1,7 @@
 <?php
 //Đăng nhập
 // if (isset($_POST['login'])){
-if(isset($_POST['id_login']) && isset($_POST['pwd_login'])){
+if(isset($_POST['id_login']) && isset($_POST['pwd_login'])) {
   $id_user = $_POST['id_login'];
   $pwd = $_POST['pwd_login'];
 
