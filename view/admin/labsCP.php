@@ -11,7 +11,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
 
-<table id="infoDevice" class="table table-striped">
+<table id="infoLab" class="table table-striped">
         <thead>
             <tr>
                 <th>Mã số</th>
@@ -25,15 +25,15 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
         </thead>
         <tbody>
           <?php
-          $sql_get_user = "SELECT * FROM lab_info ORDER BY idLab DESC";
-          if ($db->num_rows($sql_get_user)) {
+          $sql_get_lab = "SELECT * FROM lab_info ORDER BY idLab DESC";
+          if ($db->num_rows($sql_get_lab)) {
               $row="SELECT idLab FROM lab_info";
               $row_per_page=10;
               $rows=$db->num_rows($row);
               if ($rows>$row_per_page) $page=ceil($rows/$row_per_page);
               else $page=1;
-              if(isset($_GET['page']) && (int)$_GET['page'])
-                   $start=($_GET['page']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
+              if(isset($_GET['act']) && (int)$_GET['act'])
+                   $start=($_GET['act']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
               else $start=0;
               // var_dump($start);
               $val = "SELECT * FROM lab_info ORDER BY idLab ASC limit $start,$row_per_page";
@@ -64,11 +64,11 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
 $row="SELECT idLab FROM lab_info";
 $rows=$db->num_rows($row);
 $config = array(
-    'current_page'  => isset($_GET['page']) ? $_GET['page'] : 1, // Trang hiện tại
+    'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => '?action=history&page={page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => '?action=history',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/labs/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/labs',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -78,6 +78,7 @@ $paging->init($config);
 
 echo $paging->html();
 ?>
+</div>
 
     <!-- Thêm Lab -->
     <div id="addProject" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">

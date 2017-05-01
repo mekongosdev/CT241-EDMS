@@ -15,7 +15,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
       $user_borrow = $user;//Thanh vien dang dang nhap
 
       //Get idDevice hien tai va xuat ra idDevice moi nhat
-      $qry_get_idBorrowDevice = "SELECT idBorrowDevice WHERE borrow_device";
+      $qry_get_idBorrowDevice = "SELECT idBorrowDevice WHERE borrow_device ORDER BY idBorrowDevice DESC";
       if ($db->num_rows($qry_get_idBorrowDevice)) {
          $idNow = $db->num_rows($qry_get_idBorrowDevice);
          $idNewest = $idNow + 1;
