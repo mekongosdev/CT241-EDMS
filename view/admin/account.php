@@ -3,7 +3,7 @@
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 
-        echo '<h3>Tài khoản</h3>';
+        echo '<h3>Tài khoản</h3>'; 
         // Dãy nút của danh sách tài khoản
         echo
             '<form action="'.$_DOMAIN.'admin/account" method="POST">

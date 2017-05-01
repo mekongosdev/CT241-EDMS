@@ -36,6 +36,10 @@ if(isset($_POST['id_login']) && isset($_POST['pwd_login'])) {
       }
     }
   }
+  // // Nếu tồn tại POST act
+  // if (isset($_POST['act']))
+  // {
+  //   $act = trim(addslashes(htmlspecialchars($_POST['act'])));
 ?>
     <div class="login-page"></div>
 </body>

@@ -181,6 +181,7 @@ class Info {
 //     }
 // }
 
+//Encrypt
 Function Hash_Encrypt($text) {
   if ($text)
   {
@@ -188,6 +189,78 @@ Function Hash_Encrypt($text) {
       $hsh = $key.$text.$key;
       return md5($hsh);
   }
+}
+
+//Get day
+Function get_day($day,$month,$year) {
+  $month_array_365 = array('1' => 31,
+  '2' => 28,
+  '3' => 31,
+  '4' => 30,
+  '5' => 31,
+  '6' => 30,
+  '7' => 31,
+  '8' => 31,
+  '9' => 30,
+  '10' => 31,
+  '11' => 30,
+  '12' => 31,
+  );
+  $month_array_366 = array('1' => 31,
+  '2' => 29,
+  '3' => 31,
+  '4' => 30,
+  '5' => 31,
+  '6' => 30,
+  '7' => 31,
+  '8' => 31,
+  '9' => 30,
+  '10' => 31,
+  '11' => 30,
+  '12' => 31,
+  );
+  if ($year%4 == 0) {
+    $year = 366;
+    $get_day_of_month = $month_array_366;
+  } else {
+    $year = 365;
+    $get_day_of_month = $month_array_365;
+  }
+  $day_of_months = 0;
+  for ($i=1; $i < $month; $i++) {
+    $get_days = $get_day_of_month[$i];
+    $day_of_months = $day_of_months + $get_days;
+  }
+  return $year + $day_of_months + $day;
+}
+
+//Get date
+Function get_day_on_date($date) {
+  return substr($date, 8, 2);
+}
+
+Function get_month_on_date($date) {
+  return substr($date, 5, 2);
+}
+
+Function get_year_on_date($date) {
+  return substr($date, 0, 4);
+}
+
+//date minus date
+Function date_to_date($date_before,$date_after) {
+  $day_of_date1 = get_day(get_day_on_date($date_before),get_month_on_date($date_before),get_year_on_date($date_before));
+
+  $day_of_date2 = get_day(get_day_on_date($date_after),get_month_on_date($date_after),get_year_on_date($date_after));
+
+  return $day_of_date2 - $day_of_date1;
+}
+
+//day limit
+Function day_limit($date_before,$date_after,$limit) {
+  $recent = date_to_date($date_before,$date_after);
+
+  return ($recent <= $limit) ? 1 : 0;
 }
 
 ?>

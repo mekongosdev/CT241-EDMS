@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Apr 29, 2017 at 10:31 AM
+-- Generation Time: May 01, 2017 at 01:10 PM
 -- Server version: 5.6.13
 -- PHP Version: 5.4.17
 
@@ -31,9 +31,46 @@ USE `ngthucco_ptycpm`;
 CREATE TABLE IF NOT EXISTS `borrow_device` (
   `idBorrowDevice` int(255) NOT NULL AUTO_INCREMENT,
   `idDevice` int(255) NOT NULL,
-  `total` int(255) NOT NULL,
+  `idProject` int(255) NOT NULL,
+  `totalBorrow` int(255) NOT NULL,
   PRIMARY KEY (`idBorrowDevice`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=31 ;
+
+--
+-- Dumping data for table `borrow_device`
+--
+
+INSERT INTO `borrow_device` (`idBorrowDevice`, `idDevice`, `idProject`, `totalBorrow`) VALUES
+(1, 1, 1, 15),
+(2, 1, 1, 15),
+(3, 1, 1, 50),
+(4, 1, 1, 20),
+(5, 1, 1, 100),
+(6, 1, 1, 150),
+(7, 1, 1, 250),
+(8, 1, 1, 170),
+(9, 1, 1, 30),
+(10, 1, 1, 100),
+(11, 1, 1, 111),
+(12, 1, 1, 9),
+(13, 1, 1, 10),
+(14, 1, 1, 15),
+(15, 1, 1, 25),
+(16, 1, 1, 970),
+(17, 1, 1, 1999),
+(18, 1, 1, 1),
+(19, 1, 1, 1270),
+(20, 1, 1, 1998),
+(21, 1, 1, 6732),
+(22, 1, 1, 990000),
+(23, 1, 1, 500000),
+(24, 1, 1, 4500),
+(25, 1, 1, 490500),
+(26, 3, 1, 10),
+(27, 1, 3, 120),
+(28, 2, 3, 12),
+(29, 4, 2, 200),
+(30, 2, 2, 28);
 
 -- --------------------------------------------------------
 
@@ -45,10 +82,47 @@ CREATE TABLE IF NOT EXISTS `borrow_device_detail` (
   `idBorrowDeviceDetail` int(255) NOT NULL AUTO_INCREMENT,
   `idBorrowDevice` int(255) NOT NULL,
   `idUser` varchar(20) NOT NULL,
-  `dateBorrow` datetime NOT NULL,
+  `status` char(1) DEFAULT NULL,
+  `dateBorrow` datetime DEFAULT NULL,
   `dateReturn` datetime DEFAULT NULL,
   PRIMARY KEY (`idBorrowDeviceDetail`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=31 ;
+
+--
+-- Dumping data for table `borrow_device_detail`
+--
+
+INSERT INTO `borrow_device_detail` (`idBorrowDeviceDetail`, `idBorrowDevice`, `idUser`, `status`, `dateBorrow`, `dateReturn`) VALUES
+(1, 1, '2709', '0', NULL, NULL),
+(2, 2, '2709', '0', NULL, NULL),
+(3, 3, '2709', '0', NULL, NULL),
+(4, 4, '2709', '0', NULL, NULL),
+(5, 5, '2678', '0', NULL, NULL),
+(6, 6, '2709', '0', NULL, NULL),
+(7, 7, '2709', '0', NULL, NULL),
+(8, 8, '2709', '0', NULL, NULL),
+(9, 9, '2709', '0', NULL, NULL),
+(10, 10, '2709', '1', '2017-05-01 17:29:05', NULL),
+(11, 11, '2709', '0', NULL, NULL),
+(12, 12, '2709', '0', NULL, NULL),
+(13, 13, '2709', '0', NULL, NULL),
+(14, 14, '2709', '0', NULL, NULL),
+(15, 15, '2709', '0', NULL, NULL),
+(16, 16, 'B1400704', '0', NULL, NULL),
+(17, 17, '2709', '0', NULL, NULL),
+(18, 18, '2709', '0', NULL, NULL),
+(19, 19, '2709', '0', NULL, NULL),
+(20, 20, '2709', '0', NULL, NULL),
+(21, 21, '2709', '0', NULL, NULL),
+(22, 22, '2709', '0', NULL, NULL),
+(23, 23, '2709', '0', NULL, NULL),
+(24, 24, '2678', '0', NULL, NULL),
+(25, 25, '2709', '0', NULL, NULL),
+(26, 26, '2709', '0', NULL, NULL),
+(27, 27, '2709', '2', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(28, 28, '2709', '1', '2017-05-01 17:28:33', NULL),
+(29, 29, '2709', '2', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(30, 30, '2709', '1', '2017-05-01 17:24:24', NULL);
 
 -- --------------------------------------------------------
 
@@ -59,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `borrow_device_detail` (
 CREATE TABLE IF NOT EXISTS `device_info` (
   `idDevice` int(255) NOT NULL AUTO_INCREMENT,
   `idProducer` int(255) NOT NULL,
-  `idImg` int(11) NOT NULL,
+  `urlImg` longtext NOT NULL,
   `nameDevice` varchar(255) NOT NULL,
   `status` varchar(128) NOT NULL,
   `currency` varchar(255) NOT NULL,
@@ -68,16 +142,19 @@ CREATE TABLE IF NOT EXISTS `device_info` (
   `dateImport` datetime NOT NULL,
   `description` longtext NOT NULL,
   PRIMARY KEY (`idDevice`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
 -- Dumping data for table `device_info`
 --
 
-INSERT INTO `device_info` (`idDevice`, `idProducer`, `idImg`, `nameDevice`, `status`, `currency`, `pricing`, `total`, `dateImport`, `description`) VALUES
-(1, 1, 1, 'Arduino ESP8266', 'Rất tốt', 'cái', 0, 100, '2017-04-29 00:00:00', 'Mạch nhúng nền tảng Arduino với kêt nối wifi bằng ESP 8266'),
-(2, 1, 3, 'Relay 1 kênh', 'Rất tốt', 'cái', 0, 200, '2017-04-29 00:00:00', 'Relay 1 kênh, chức năng như công tắc một thiết bị'),
-(3, 1, 3, 'NanoPC', 'Rất tốt', 'cái', 0, 20, '2017-04-29 00:00:00', 'Máy tính nhúng loại nhỏ, cấu hình khá, dùng cho nhiều công việc khác nhau');
+INSERT INTO `device_info` (`idDevice`, `idProducer`, `urlImg`, `nameDevice`, `status`, `currency`, `pricing`, `total`, `dateImport`, `description`) VALUES
+(1, 1, 'view/images/arduino.jpg', 'Arduino ESP8266', 'Rất tốt', 'cái', 0, 4880, '2017-04-29 00:00:00', 'Mạch nhúng nền tảng Arduino với kết nối wifi bằng ESP8266'),
+(2, 1, 'view/images/relay.jpg', 'Relay 1 kênh', 'Rất tốt', 'cái', 0, 160, '2017-04-29 00:00:00', 'Relay 1 kênh, chức năng như công tắc một thiết bị'),
+(3, 1, 'view/images/relay.jpg', 'NanoPC', 'Rất tốt', 'cái', 0, 10, '2017-04-29 00:00:00', 'Máy tính nhúng loại nhỏ, cấu hình khá, dùng cho nhiều công việc khác nhau'),
+(4, 1, 'view/images/arduino.jpg', 'Arduino Wifi ESP8266', 'Tốt', 'cái', 0, 1000, '2017-04-30 00:00:00', 'Mạch điện tử điều khiển tự động, cho phép lập trình các ứng dụng nhúng từ cơ bản đến nâng cao'),
+(5, 1, 'view/images/arduino.jpg', 'Arduino Wifi ESP8266', 'Tốt', 'cái', 0, 1200, '2017-04-30 00:00:00', 'Mạch điện tử điều khiển tự động, cho phép lập trình các ứng dụng nhúng từ cơ bản đến nâng cao'),
+(6, 1, 'view/images/arduino.jpg', 'Arduino Wifi', 'Trung bình', 'cái', 0, 200, '2017-04-30 00:00:00', 'Mạch điện tử điều khiển tự động, cho phép lập trình các ứng dụng nhúng từ cơ bản đến nâng cao, kết nối wifi bằng mạch nhúng ESP8266');
 
 -- --------------------------------------------------------
 
@@ -92,14 +169,14 @@ CREATE TABLE IF NOT EXISTS `images` (
   `size` int(11) NOT NULL,
   `dateUploaded` datetime NOT NULL,
   PRIMARY KEY (`idImg`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=34 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=47 ;
 
 --
 -- Dumping data for table `images`
 --
 
 INSERT INTO `images` (`idImg`, `url`, `type`, `size`, `dateUploaded`) VALUES
-(1, 'view/images/arduino.jpg', 'jpg', 75516, '2017-04-27 11:34:50'),
+(1, 'view/images/user.png', 'png', 2202, '2017-05-01 08:29:28'),
 (2, 'view/images/nanopc.jpg', 'jpg', 94690, '2017-04-27 11:38:52'),
 (3, 'view/images/relay.jpg', 'jpg', 76988, '2017-04-27 11:38:52'),
 (4, 'view/images/nanopc.jpg', 'jpg', 94690, '2017-04-27 11:38:52'),
@@ -130,7 +207,20 @@ INSERT INTO `images` (`idImg`, `url`, `type`, `size`, `dateUploaded`) VALUES
 (30, 'view/images/10406613_780239582049618_8993255793532770531_n.jpg', 'jpg', 75481, '2017-04-29 12:15:21'),
 (31, 'view/images/6789751646_fc1aa3c492_b.jpg', 'jpg', 281928, '2017-04-29 12:16:43'),
 (32, 'view/images/arduino.jpg', 'jpg', 75516, '2017-04-29 12:44:58'),
-(33, 'view/images/arduino.jpg', 'jpg', 75516, '2017-04-29 12:45:45');
+(33, 'view/images/arduino.jpg', 'jpg', 75516, '2017-04-29 12:45:45'),
+(34, 'view/images/arduino.jpg', 'jpg', 75516, '2017-04-30 21:41:24'),
+(35, 'view/images/add-icon.png', 'png', 7614, '2017-04-30 21:44:47'),
+(36, 'view/images/male-circle-512.png', 'png', 32241, '2017-04-30 21:53:17'),
+(37, 'view/images/admin-icon.png', 'png', 246997, '2017-04-30 21:55:36'),
+(38, 'view/images/admin-icon.png', 'png', 246997, '2017-04-30 21:56:28'),
+(39, 'view/images/admin-icon.png', 'png', 246997, '2017-04-30 21:58:59'),
+(40, 'view/images/admin-icon.png', 'png', 246997, '2017-04-30 22:12:30'),
+(41, 'view/images/arduino.jpg', 'jpg', 75516, '2017-04-30 22:30:25'),
+(42, 'view/images/arduino.jpg', 'jpg', 75516, '2017-04-30 22:35:41'),
+(43, 'view/images/user.png', 'png', 2202, '2017-05-01 08:29:28'),
+(44, 'view/images/male-circle-512.png', 'png', 32241, '2017-05-01 10:07:40'),
+(45, 'view/images/male-circle-512.png', 'png', 32241, '2017-05-01 10:13:19'),
+(46, 'view/images/male-circle-512.png', 'png', 32241, '2017-05-01 10:40:31');
 
 -- --------------------------------------------------------
 
@@ -146,17 +236,19 @@ CREATE TABLE IF NOT EXISTS `lab_info` (
   `address` varchar(255) NOT NULL,
   `location` longtext,
   PRIMARY KEY (`idLab`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
 
 --
 -- Dumping data for table `lab_info`
 --
 
 INSERT INTO `lab_info` (`idLab`, `nameLab`, `unit`, `phone`, `address`, `location`) VALUES
-(1, 'PTN Phân tích hiệu năng phần mềm', 'BM Công nghệ phần mềm', '07103711777', 'Khoa CNTT&TT', 'không có'),
-(2, 'PTN Hệ thống thông tin tích hợp', 'BM Hệ thống thông tin', '07103712711', 'Khoa CNTT&TT', 'không có'),
-(3, 'PTN Mạng di động', 'BM Mạng máy tính và truyền thông', '07103712712', 'Khoa CNTT&TT', 'không có'),
-(4, 'PTN Chuyên sâu', 'Phòng Quản lý CSVC', '07103777111', 'Trường ĐH Cần Thơ', 'không có');
+(1, 'PTN Phân tích hiệu năng phần mềm', 'BM Công nghệ phần mềm', '07103711777', 'Khoa CNTT&TT', NULL),
+(2, 'PTN Hệ thống thông tin tích hợp', 'BM Hệ thống thông tin', '07103712711', 'Khoa CNTT&TT', NULL),
+(3, 'PTN Mạng di động', 'BM Mạng máy tính và truyền thông', '07103712712', 'Khoa CNTT&TT', NULL),
+(4, 'PTN Chuyên sâu', 'Phòng Quản lý CSVC', '07103777111', 'Trường ĐH Cần Thơ', NULL),
+(5, 'PTN Vật liệu mới', 'BM Công trình xây dựng', '07103123321', 'Khoa Công nghệ, ĐH Cần Thơ', ''),
+(6, 'PTN Giống thủy sinh', 'Phòng nghiên cứu thủy sinh', '07103123654', 'Viện NC&PT CNSH', '');
 
 -- --------------------------------------------------------
 
@@ -182,7 +274,7 @@ INSERT INTO `options` (`idOption`, `nameOption`, `valueOption`, `statusOption`) 
 (3, 'keyword', 'IoT,Embedded,Hệ thống quản lý thiết bị nhúng,ĐH Cần Thơ, Khoa CNTT&TT,ptycpm,Phân tích yêu cầu phần mềm,CT241,Thiết bị nhúng', NULL),
 (4, 'goAna', 'UA-84266655-1', NULL),
 (5, 'footerSite', 'Copyright © 2017 - Product of Team 5.', NULL),
-(6, 'siteIcon', 'view/icon/admin-icon.png', NULL);
+(6, 'siteIcon', 'view/images/admin-icon.png', NULL);
 
 -- --------------------------------------------------------
 
@@ -198,15 +290,17 @@ CREATE TABLE IF NOT EXISTS `partner_info` (
   `phone` varchar(15) NOT NULL,
   `email` varchar(255) NOT NULL,
   PRIMARY KEY (`idProducer`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `partner_info`
 --
 
 INSERT INTO `partner_info` (`idProducer`, `nameProducer`, `service`, `address`, `phone`, `email`) VALUES
-(1, 'Hshop', 'Linh kiện', 'TP Hồ Chí Minh', '01234567890', 'sales@hshop.vn'),
-(2, 'Fablab Cần Thơ', 'Phòng Lab', 'Cần Thơ', '07103771117', 'technical@fablabcantho.org');
+(1, 'Hshop', 'Linh kiện điện tử', 'Q.5, TP Hồ Chí Minh', '01234567890', 'sales@hshop.vn'),
+(2, 'Fablab Cần Thơ', 'Phòng Lab', 'Cần Thơ', '07103771117', 'technical@fablabcantho.org'),
+(3, 'Test', 'Thử nghiệm', 'Cần Thơ', '12345689960', 'sfsf@ad.com'),
+(4, 'CEC', 'Vi mạch', 'NY, New York, US', '0112313524', 'ad5856@cec.us');
 
 -- --------------------------------------------------------
 
@@ -259,7 +353,7 @@ CREATE TABLE IF NOT EXISTS `roles_cp` (
   `rolesGroup` longtext NOT NULL,
   `roleDesc` varchar(255) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`idRole`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
 --
 -- Dumping data for table `roles_cp`
@@ -274,30 +368,6 @@ INSERT INTO `roles_cp` (`idRole`, `roleName`, `rolesGroup`, `roleDesc`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `staff_user`
---
-
-CREATE TABLE IF NOT EXISTS `staff_user` (
-  `idStaff` varchar(20) NOT NULL,
-  `idUser` varchar(20) NOT NULL,
-  PRIMARY KEY (`idStaff`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `student_user`
---
-
-CREATE TABLE IF NOT EXISTS `student_user` (
-  `idStudent` varchar(20) NOT NULL,
-  `idUser` varchar(20) NOT NULL,
-  PRIMARY KEY (`idStudent`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `user_auth`
 --
 
@@ -305,8 +375,9 @@ CREATE TABLE IF NOT EXISTS `user_auth` (
   `idUser` varchar(20) NOT NULL,
   `pwd` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `rolesName` varchar(255) NOT NULL,
+  `roleName` varchar(255) NOT NULL,
   `status` char(1) NOT NULL DEFAULT '1',
+  `dateCreate` datetime NOT NULL,
   PRIMARY KEY (`idUser`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -314,12 +385,15 @@ CREATE TABLE IF NOT EXISTS `user_auth` (
 -- Dumping data for table `user_auth`
 --
 
-INSERT INTO `user_auth` (`idUser`, `pwd`, `email`, `rolesName`, `status`) VALUES
-('2678', '123456', 'hqnghi@cit.ctu.edu.vn', 'Admin', '1'),
-('2709', 'tvhoang', 'tvhoang@cit.ctu.edu.vn', 'Owner', '1'),
-('B1400704', '123456', 'luanb1400704@student.ctu.edu.vn', 'Admin', '1'),
-('B1400706', '123456', 'minhb1400706@student.ctu.edu.vn', 'Admin', '1'),
-('B1400731', '123456', 'thucb1400731@student.ctu.edu.vn', 'Admin', '1');
+INSERT INTO `user_auth` (`idUser`, `pwd`, `email`, `roleName`, `status`, `dateCreate`) VALUES
+('2678', '123456', 'hqnghi@cit.ctu.edu.vn', 'Admin', '1', '2017-05-01 08:29:28'),
+('2709', 'tvhoang', 'tvhoang@cit.ctu.edu.vn', 'Owner', '1', '2017-05-01 08:29:28'),
+('B1400704', '123456', 'luanb1400704@student.ctu.edu.vn', 'Admin', '1', '2017-05-01 08:29:28'),
+('B1400706', '123456', 'minhb1400706@student.ctu.edu.vn', 'Manager', '1', '2017-05-01 08:29:28'),
+('B1400731', '123456', 'thucb1400731@student.ctu.edu.vn', 'Admin', '1', '2017-05-01 08:29:28'),
+('B1400797', '123456', 'tiepb1400797@student.ctu.edu.vn', 'Member', '1', '2017-05-01 08:29:29'),
+('tester', '123456', 'tester@test.dev', 'Admin', '1', '2017-05-01 11:04:51'),
+('tester3', '123456', 'testerss@test.dev', 'Admin', '1', '2017-05-01 11:06:45');
 
 -- --------------------------------------------------------
 
@@ -352,7 +426,9 @@ INSERT INTO `user_info` (`idUser`, `idImg`, `fullName`, `phone`, `email`, `websi
 ('2709', 31, 'Trần Văn Hoàng', '0909090909', 'tvhoang@cit.ctu.edu.vn', 'không có', 'không có', 'Xuân Khánh, Cần Thơ', 'Giảng viên', 'Thạc sĩ', 'BM Công nghệ phần mềm', '1'),
 ('B1400704', 20, 'Lê Minh Luân', '0977177771', 'luanb1400704@student.ctu.edu.vn', 'không có', 'không có', 'ĐH Cần Thơ', 'Thực tập sinh', 'Đại học', 'Khoa CNTT&TT', '0'),
 ('B1400706', 20, 'Nguyễn Thiện Minh', '01676776677', 'minhb1400706@student.ctu.edu.vn', 'không có', 'không có', 'ĐH Cần Thơ', 'Thực tập sinh', 'Đại học', 'Khoa CNTT&TT', '0'),
-('B1400731', 19, 'Lê Nguyên Thức', '01678911202', 'thucb1400731@student.ctu.edu.vn', 'https://ngthuc.com/', 'https://fb.com/lenguyenthuc/', 'Hưng Lợi, Cần Thơ', 'Thực tập sinh', 'Đại học', 'BM Công nghệ phần mềm', '0');
+('B1400731', 19, 'Lê Nguyên Thức', '01678911202', 'thucb1400731@student.ctu.edu.vn', 'https://ngthuc.com/', 'https://fb.com/lenguyenthuc/', 'Hưng Lợi, Cần Thơ', 'Thực tập sinh', 'Đại học', 'BM Công nghệ phần mềm', '0'),
+('B1400797', 46, 'Trác Mẫn Tiệp', '01677889911', 'tiepb1400797@student.ctu.edu.vn', 'không có', 'không có', 'ĐH Cần Thơ', 'Thực tập sinh', 'Đại học', 'Khoa CNTT&TT', '0'),
+('tester', 1, 'Tester', '01231231231', 'tester@test.dev', 'không có', 'không có', 'ĐH Cần Thơ', 'Trưởng khoa', 'Tiến sĩ khoa học', 'Khoa CNTT&TT', '1');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

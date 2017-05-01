@@ -47,7 +47,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
         </tbody>
     </table>
 
-    <div class="container">
+<div class="container">
 <?php
 $row="SELECT idProject FROM project_info";
 $rows=$db->num_rows($row);

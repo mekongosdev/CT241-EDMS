@@ -15,7 +15,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
       $user_borrow = $user;//Thanh vien dang dang nhap
 
       //Get idDevice hien tai va xuat ra idDevice moi nhat
-      $qry_get_idBorrowDevice = "SELECT idBorrowDevice WHERE borrow_device ORDER BY idBorrowDevice DESC";
+      $qry_get_idBorrowDevice = "SELECT idBorrowDevice FROM borrow_device ORDER BY idBorrowDevice DESC";
       if ($db->num_rows($qry_get_idBorrowDevice)) {
          $idNow = $db->num_rows($qry_get_idBorrowDevice);
          $idNewest = $idNow + 1;
@@ -28,7 +28,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
       $totalNow = $totalDevice - $total;
       $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
       //Ghi nhan qua trinh muon
-      $qry_borrow = "INSERT INTO borrow_device(idDevice,idProject,total) VALUES ('$idDevice','$idProject','$total')";
+      $qry_borrow = "INSERT INTO borrow_device(idDevice,idProject,totalBorrow) VALUES ('$idDevice','$idProject','$total')";
       $qry_borrow_detail = "INSERT INTO borrow_device_detail(idBorrowDevice,idUser,status) VALUES ('$idNewest','$user_borrow',0)";//status = 0 -> waiting accept
       if ($totalDevice > 0) {
           if ($total <= $totalDevice) {

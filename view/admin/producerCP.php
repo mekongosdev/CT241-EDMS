@@ -39,11 +39,14 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
                 <td>'.$row['idProducer'].'</td>
                 <td>'.$row['nameProducer'].'</td>
                 <td>'.$row['service'].'</td>
-                <td>'.$row['phone'].'</td>
-                <td>'.$row['email'].'</td>
-                <td><a type="button" class="btn btn-primary" data-toggle="modal" data-target="#editProducer"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                <td><a href="tel:'.$row['phone'].'">'.$row['phone'].'</a></td>
+                <td><a href="mailto:'.$row['email'].'">'.$row['email'].'</a></td>
+                <td>
+                    <button type="button" id="thiseditProducer" class="btn btn-primary" data-id="'.$row['idProducer'].'" data-name="'.$row['nameProducer'].'" data-service="'.$row['service'].'" data-phone="'.$row['phone'].'" data-address="'.$row['address'].'" data-mail="'.$row['email'].'" data-toggle="modal" data-target="#editProducer"><span class="glyphicon glyphicon-pencil"></span></button>
+                    <button type="button" id="thisdelProducer" class="btn btn-danger" data-id="'.$row['idProducer'].'" data-toggle="modal" data-target="#delProducer"><span class="glyphicon glyphicon-trash"></span></button>
+                </td>
             </tr>';
-          } //<td><a href="?action=transaction-edit&id='.$row['id'].'"><span class="glyphicon glyphicon-pencil"></span></a></td>
+          }
         } else {
             echo '<br><br><div class="alert alert-info">Chưa có nhà cung cấp/sản xuất nào.</div>';
         }
@@ -72,15 +75,16 @@ echo $paging->html();
 ?>
 </div>
 
+    <!-- Thêm đối tác -->
     <div id="addProducer" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Thêm đối tác</h4>
+                    <h4 class="modal-title" id="">Thêm nhà cung cấp/sản xuất</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/producer" method="post">
                       <fieldset class="form-group">
                           <label for="producerName">Tên đối tác</label>
                           <input type="text" class="form-control" name="producerName" id="producerName" placeholder="Nhập tên đối tác">
@@ -110,77 +114,131 @@ echo $paging->html();
         </div>
     </div>
 
-    <!-- <div id="editProducer" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <!-- Chỉnh sửa nhà cung cấp/sản xuất -->
+    <div id="editProducer" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Chỉnh sửa đối tác</h4>
+                    <h4 class="modal-title" id="">Chỉnh sửa nhà cung cấp/sản xuất</h4>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form action="<?php echo $_DOMAIN; ?>admin/producer" method="post">
+                      <input type="hidden" name="toEditProducer" id="toEditProducer" value=""/>
                       <fieldset class="form-group">
-                          <label for="ProducerName">Tên đối tác</label>
-                          <input type="text" class="form-control" name="ProducerName" id="ProducerName" placeholder="Nhập tên đối tác">
+                          <label for="producerName">Tên đối tác</label>
+                          <input type="text" class="form-control" name="producerName" id="thisproducerName" value="" placeholder="Nhập tên đối tác">
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="serviceProducer">Dịch vụ</label>
-                          <input type="text" class="form-control" name="serviceProducer" id="serviceProducer" placeholder="Loại dịch vụ cung cấp?">
+                          <input type="text" class="form-control" name="serviceProducer" id="thisserviceProducer" value="" placeholder="Loại dịch vụ cung cấp?">
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="phoneProducer">Điện thoại</label>
-                          <input type="number" class="form-control" name="phoneProducer" id="phoneProducer" placeholder="Nhập số điện thoại">
+                          <input type="number" class="form-control" name="phoneProducer" id="thisphoneProducer" value="" placeholder="Nhập số điện thoại">
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="addressProducer">Địa chỉ</label>
-                          <input type="text" class="form-control" name="addressProducer" id="addressProducer" placeholder="Nhập địa chỉ">
+                          <input type="text" class="form-control" name="addressProducer" id="thisaddressProducer" value="" placeholder="Nhập địa chỉ">
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="mailProducer">Email</label>
-                          <input type="mail" class="form-control" name="mailProducer" id="mailProducer" placeholder="Nhập email">
+                          <input type="mail" class="form-control" name="mailProducer" id="thismailProducer" value="" placeholder="Nhập email">
                       </fieldset>
                 </div>
                 <div class="modal-footer">
+                    <button type="submit" name="editProducer" class="btn btn-primary">Thêm</button></form>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteProducer">Xóa</button>
-                    <button type="submit" class="btn btn-primary">Đồng ý</button></form>
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
-    <!-- <div id="deleteProducer" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div id="delProducer" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Bạn đang xóa đối tác!</h4>
+                    <h4 class="modal-title">Xóa nhà cung cấp/sản xuất</h4>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Bạn có muốn tiếp tục?</strong></p>
-                    <form>
-                        <div class="modal-footer">
-                            <a href="delete" type="button" class="btn btn-danger">Yes</a>
+                  <center>
+                    <h4>Hành động này cần xác nhận: Không thể hoàn tác!</h4>
+                    <p>Vui lòng kiểm tra cẩn thận!</p>
+                  </center>
+                </div>
+                <div class="modal-footer">
+                  <form action="<?php echo $_DOMAIN; ?>admin/producer" method="post">
+                    <input type="hidden" name="toDelProducer" id="toDelProducer" value=""/>
+                            <button type="submit" name="delProducer" class="btn btn-danger">Đồng ý</button></form>
                             <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div> -->
+
+        <!-- JS Function -->
+        <script language="JavaScript">
+        // using latest bootstrap so, show.bs.modal
+        //editMember
+        $('#editProducer').on('show.bs.modal', function(e) {
+          var id = $(e.relatedTarget).data('id');
+          $("#toEditProducer").val(id);
+          var name = $(e.relatedTarget).data('name');
+          $("#thisproducerName").val(name);
+          var service = $(e.relatedTarget).data('service');
+          $("#thisserviceProducer").val(service);
+          var phone = $(e.relatedTarget).data('phone');
+          $("#thisphoneProducer").val(phone);
+          var address = $(e.relatedTarget).data('address');
+          $("#thisaddressProducer").val(address);
+          var mail = $(e.relatedTarget).data('mail');
+          $("#thismailProducer").val(mail);
+        });
+        //delMember
+        $('#deleteMember').on('show.bs.modal', function(e) {
+          var product = $(e.relatedTarget).data('id');
+          $("#toDelProducer").val(product);
+        });
+        </script>
 
     <?php
-    //Thêm thiết bị
+    //Thêm nhà cung cấp
       if(isset($_POST['add_Producer'])){
         $producerName = addslashes($_POST['producerName']);
         $serviceProducer = addslashes($_POST['serviceProducer']);
         $phoneProducer = $_POST['phoneProducer'];
         $addressProducer = addslashes($_POST['addressProducer']);
         $mailProducer = addslashes($_POST['mailProducer']);
-        if($ProducerName && $serviceProducer && $phoneProducer && $addressProducer && $mailProducer)
+        if($producerName && $serviceProducer && $phoneProducer && $addressProducer && $mailProducer)
            {
              $sql="INSERT INTO partner_info(nameProducer, service, address, phone, email) VALUES ('{$producerName}', '{$serviceProducer}', '{$addressProducer}', '{$phoneProducer}', '{$mailProducer}')";
              $query = $db->query($sql);
-             echo "<script>alert('Thêm giao dịch thành công!')</script>";
-          } else echo "<script>alert('Vui lòng nhập trường còn bỏ trống')</script>";
+             new Success($_DOMAIN.'admin/producer/');
+         } else new Warning($_DOMAIN.'admin/producer','Vui lòng điền đầy đủ thông tin');
+        }
+        //Xử lý sửa thông tin nhà cung cấp
+        if (isset($_POST['editProducer'])) {
+          $idProducer = $_POST['toEditProducer'];
+          $name = $_POST['producerName'];
+          $service = $_POST['serviceProducer'];
+          $phone = $_POST['phoneProducer'];
+          $address = $_POST['addressProducer'];
+          $mail = $_POST['mailProducer'];
+
+          if ($name && $service && $phone && $address && $mail) {
+              $sql_edit_producer = "UPDATE partner_info SET nameProducer = '$name',service = '$service',address = '$address',phone = '$phone',email = '$mail' WHERE idProducer = '$idProducer'";
+              $db->query($sql_edit_producer);
+              new Success($_DOMAIN.'admin/producer/');
+          } else new Warning($_DOMAIN.'admin/producer','Vui lòng điền đầy đủ thông tin');
+        }
+
+        //Xử lý xóa nhà cung cấp
+        if (isset($_POST['delProducer'])) {
+          $idProducer = $_POST['toDelMember'];
+
+          $sql_del_producer = "DELETE FROM partner_info WHERE idProducer = '$idProducer'";
+          $db->query($sql_del_producer);
+          new Success($_DOMAIN.'admin/producer/');
         }
     ?>

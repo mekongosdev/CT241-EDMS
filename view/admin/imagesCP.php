@@ -4,17 +4,42 @@
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
         <h3>Hình ảnh</h3>
+          <form action="<?php echo $_DOMAIN; ?>admin/images" method="POST">
             <a class="btn btn-default" data-toggle="modal" data-target="#addNewPhoto">
                 <span class="glyphicon glyphicon-plus"></span> Thêm
             </a>
             <a href="<?php echo $_DOMAIN; ?>admin/images" class="btn btn-default">
                 <span class="glyphicon glyphicon-repeat"></span> Reload
             </a>
-            <a class="btn btn-danger" id="del_img_list">
+            <button class="btn btn-danger" id="del_img_list" name="delImages" type="submit">
                 <span class="glyphicon glyphicon-trash"></span> Xoá
-            </a>
+            </button>
 
 <?php
+       //Xóa nhiều ảnh
+        if (isset($_POST['delImages'])) {
+        $id_img_del = $_POST['idImg'];
+        foreach ($id_img_del as $key => $data) {
+          $sql_query_name = "SELECT * FROM images WHERE idImg = '$data'";
+          foreach ($db->fetch_assoc($sql_query_name) as $key => $img_url) {
+            $sql_del_imgs = "DELETE FROM images WHERE url = '$img_url'";
+            $db->query($sql_del_imgs);
+          }
+        }
+        // new Success($_DOMAIN.'admin/images','Xóa các hình ảnh thành công');
+        }
+        //Xóa 1 ảnh
+        if (isset($_POST['delImgOK'])) {
+        $idDel = $_POST['toDelImg'];
+
+        $sql_query_name = "SELECT * FROM images WHERE idImg = '$idDel'";
+        foreach ($db->fetch_assoc($sql_query_name) as $key => $img_url) {
+          $sql_del_img = "DELETE FROM images WHERE url = '$img_url'";
+          $db->query($sql_del_img);
+        }
+        // new Success($_DOMAIN.'admin/images','Xóa hình ảnh thành công');
+        }
+
       // Content danh sách hình ảnh
           $sql_get_images = "SELECT * FROM images ORDER BY idImg DESC";
           if ($db->num_rows($sql_get_images))
@@ -32,14 +57,6 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
                       <div class="col-md-12">
                           <div class="checkbox"><label><input type="checkbox" onClick="toggle(this)"> Chọn/Bỏ chọn tất cả</label></div>
                       </div>
-                  <script language="JavaScript">
-                        function toggle(source) {'."
-                          checkboxes = document.getElementsByName('idImg[]')".';
-                            for(var i=0, n=checkboxes.length;i<n;i++) {
-                              checkboxes[i].checked = source.checked;
-                            }
-                          }
-                  </script>
               ';
 
               $val_images = "SELECT * FROM images ORDER BY idImg DESC LIMIT $start,$row_per_page";
@@ -77,7 +94,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
                                       </span>
                                       <input type="text" class="form-control" value="' . str_replace('admin/', '', $_DOMAIN)  . $data_img['url'] . '" disabled>
                                       <span class="input-group-btn">
-                                          <a href="'.$_DOMAIN.'admin/images/delete_img" class="btn btn-danger del-img" data-id="' . $data_img['idImg'] . '">
+                                          <a class="btn btn-danger" data-id="'.$data_img['idImg'].'" data-toggle="modal" data-target="#thisDelImg">
                                               <span class="glyphicon glyphicon-trash"></span>
                                           </a>
                                       </span>
@@ -90,7 +107,8 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
                       </div>
                   ';
               }
-              echo '</div>';
+              echo '</div>
+              </form>';
           }
           else
           {
@@ -119,90 +137,72 @@ echo $paging->html();
 
 echo '</div>';
 
-        // Xử Lý Upload
-          if (isset($_FILES['img_up'])) {
-            foreach($_FILES['img_up']['name'] as $name => $value)
-          		{
-                $dir = 'view/images/';
-                $name_img = stripslashes($_FILES['img_up']['name'][$name]);
-                $source_img = $_FILES['img_up']['tmp_name'][$name];
-                $size_img = $_FILES['img_up']['size'][$name]; // Dung lượng file
+echo '<!-- Content chức năng tài khoản -->
+<!-- Xóa hình ảnh -->
+<div class="modal fade" id="thisDelImg" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Xóa tài khoản!</h4>
+      </div>
+      <div class="modal-body">
+      <form action="'.$_DOMAIN.'admin/images" method="POST">
+        <input type="hidden" name="toDelImg" id="toDelImg" value=""/>
+        <center>
+          <p><strong>Xác nhận xóa hình ảnh</strong></p>
+        </center>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" name="delImgOK" class="btn btn-primary">Đồng ý</button></form>
+      </div>
+    </div>
+  </div>
+</div>';
 
-                if ($size_img > 10485760){
-                    new Warning('','File không được lớn hơn 10MB');
-                } else {
-                    // Upload file
-                    $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
-                  	move_uploaded_file($source_img, $path_img); // Upload file
-                    $array = (explode(".",$name_img));
-                    $type_img = $array[1];// Loại file
-                  	$url_img = $path_img; // Đường dẫn file
-
-                    // Thêm dữ liệu vào table
-                    $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
-                    $db->query($sql_up_file);
-                    new Success($_DOMAIN.'admin/images','Upload ảnh thành công');
-                    }
-                  }
-                }
-
-// Nếu tồn tại POST act
-if (isset($_POST['act']))
-{
-  $act = trim(addslashes(htmlspecialchars($_POST['act'])));
-
-  // Xoá nhiều ảnh cùng lúc
-  if ($act == 'delete_img_list')
-  {
-    foreach ($_POST['idImg'] as $key => $id_img)
-    {
-      $sql_check_id_img_exist = "SELECT * FROM images WHERE idImg = '$id_img'";
-      if ($db->num_rows($sql_check_id_img_exist))
+// Xử Lý Upload
+  if (isset($_FILES['img_up'])) {
+    foreach($_FILES['img_up']['name'] as $name => $value)
       {
-        $data_img = $db->fetch_assoc($sql_check_id_img_exist, 1);
-        if (file_exists($data_img['url']))
-        {
-          unlink($data_img['url']);
+        $dir = 'view/images/';
+        $name_img = stripslashes($_FILES['img_up']['name'][$name]);
+        $source_img = $_FILES['img_up']['tmp_name'][$name];
+        $size_img = $_FILES['img_up']['size'][$name]; // Dung lượng file
+
+        if ($size_img > 10485760){
+            new Warning('','File không được lớn hơn 10MB');
+        } else {
+            // Upload file
+            $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
+            move_uploaded_file($source_img, $path_img); // Upload file
+            $array = (explode(".",$name_img));
+            $type_img = $array[1];// Loại file
+            $url_img = $path_img; // Đường dẫn file
+
+            // Thêm dữ liệu vào table
+            $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
+            $db->query($sql_up_file);
+            new Success($_DOMAIN.'admin/images','Upload ảnh thành công');
+            }
+          }
         }
-
-        $sql_delete_img = "DELETE FROM images WHERE idImg = '$id_img'";
-        $db->query($sql_delete_img);
-      }
-    }
-    $db->close();
-  }
-  // Xoá ảnh chỉ định
-  else if ($act == 'delete_img')
-  {
-    $id_img = trim(htmlspecialchars(addslashes($_POST['idImg'])));
-    $sql_check_id_img_exist = "SELECT * FROM images WHERE idImg = '$id_img'";
-    if ($db->num_rows($sql_check_id_img_exist))
-    {
-      $data_img = $db->fetch_assoc($sql_check_id_img_exist, 1);
-      if (file_exists($data_img['url']))
-      {
-        unlink($data_img['url']);
-      }
-
-      $sql_delete_img = "DELETE FROM images WHERE idImg = '$id_img'";
-      $db->query($sql_delete_img);
-      $db->close();
-    }
-  }
-}
-// else
-// {
-//   new Redirect($_DOMAIN);
-// }
-// }
-// // Ngược lại chưa đăng nhập
-// else
-// {
-//     new Redirect($_DOMAIN); // Trở về trang index
-// }
 
 ?>
 
+<!-- JS Function -->
+<script language="JavaScript">
+      function toggle(source) {
+        checkboxes = document.getElementsByName('idImg[]');
+          for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+          }
+        }
+//delUser
+$('#thisDelImg').on('show.bs.modal', function(e) {
+  var product = $(e.relatedTarget).data('id');
+  $("#toDelImg").val(product);
+});
+</script>
 
 <div class="modal fade" id="addNewPhoto" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
   <div class="modal-dialog">

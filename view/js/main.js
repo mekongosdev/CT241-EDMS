@@ -77,18 +77,18 @@ $(document).ready(function () {
         });
     });
 */
-
-$(document).ready(function () {
-        $('editDevice2').click(function () {
-
-            $.post("action.php",
-                {
-                    id: this.id
-                },
-                function (data, status) {
-                    $(".modal-body").html(data)
-                });
-            $("#modalThongBao").modal('show');
-
-        });
-    });
+// 
+// $(document).ready(function () {
+//         $('editDevice2').click(function () {
+//
+//             $.post("action.php",
+//                 {
+//                     id: this.id
+//                 },
+//                 function (data, status) {
+//                     $(".modal-body").html(data)
+//                 });
+//             $("#modalThongBao").modal('show');
+//
+//         });
+//     });

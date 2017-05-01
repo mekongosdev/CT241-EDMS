@@ -47,7 +47,8 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
                     <td>'.$row['status'].'</td>
                     <td>'.$row['total'].'</td>
                     <td>
-                        <button type="button" id="editMembers" class="btn btn-primary" data-toggle="modal" data-target="#editMember"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" id="thiseditDevice" class="btn btn-primary" data-toggle="modal" data-target="#editDevice"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" id="thisaddTotal" class="btn btn-warning" data-toggle="modal" data-target="#addTotal"><span class="glyphicon glyphicon-plus"></span></button>
                     </td>
                 </tr>';
               }
