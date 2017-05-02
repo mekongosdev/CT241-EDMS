@@ -1,17 +1,17 @@
 # ptycpm_htql_thietbinhung
-Page GitHub: https://ngthuc.github.io/ptycpm_htql_thietbinhung/
-URL demo: https://demo.ngthuc.com/project/ptycpm/
-This website uses the following technologies and platforms:
-* Front-end: 
+## Page GitHub: https://ngthuc.github.io/ptycpm_htql_thietbinhung/
+## URL demo: https://demo.ngthuc.com/project/ptycpm/
+## This website uses the following technologies and platforms:
+### Front-end: 
 - HTML/CSS
 - Twitter Bootstrap
 - Javascript
 - jQuery (JS library)
-* Back-end:
+### Back-end:
 - PHP
 - OOP technical with a part of MVC 
 - MySQL (use MySQLi to query)
-* Tools:
+### Tools:
 - Atom (text editor)
 - GitHub Desktop (git)
 - USB WebServer (localhost)
