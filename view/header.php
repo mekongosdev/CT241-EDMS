@@ -12,18 +12,18 @@ foreach ($db->fetch_assoc($sql_get_setting, 0) as $key=>$data){
     <meta http-equiv="content-Type" content="text/html; charset=utf-8">
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title><?php echo $value[0]; ?></title>
-    <meta name="description" content="<?php echo $value[1]; ?>">
-    <meta name="keywords" content="<?php echo $value[2]; ?>">
-    <meta property="og:title" content="<?php echo $value[0]; ?>" />
+    <title><?php echo $value[1]; ?></title>
+    <meta name="description" content="<?php echo $value[2]; ?>">
+    <meta name="keywords" content="<?php echo $value[3]; ?>">
+    <meta property="og:title" content="<?php echo $value[1]; ?>" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="<?php echo $_DOMAIN; echo $value[5]; ?>" />
+    <meta property="og:image" content="<?php echo $_DOMAIN; echo $value[0]; ?>" />
     <meta property="og:description" content="<?php echo $value[1]; ?>" />
     <meta property="og:url" content="<?php echo $_DOMAIN; ?>" />
-    <link rel="canonical" href="<?php echo $_DOMAIN; echo $value[5]; ?>" />
+    <link rel="canonical" href="<?php echo $_DOMAIN; echo $value[0]; ?>" />
     <meta property="og:site_name" content="<?php echo $_DOMAIN; ?>" />
     <meta name="robots" content="INDEX, FOLLOW" />
-    <link rel="icon" href="<?php echo $_DOMAIN; echo $value[5]; ?>" type="image/png">
+    <link rel="icon" href="<?php echo $_DOMAIN; echo $value[0]; ?>" type="image/png">
     <link rel="alternate" href="<?php echo $_DOMAIN; ?>" hreflang="vi-vn" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -49,7 +49,7 @@ foreach ($db->fetch_assoc($sql_get_setting, 0) as $key=>$data){
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-    ga('create', '<?php echo $value[3]; ?>', 'auto');
+    ga('create', '<?php echo $value[4]; ?>', 'auto');
     ga('send', 'pageview');
 
   </script>

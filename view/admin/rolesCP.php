@@ -1,10 +1,10 @@
 <?php
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
-?>
+new Role($roleUser);?>
 
 <h3>Quản lý phân quyền thành viên
-  <a href="<?php echo $_DOMAIN; ?>admin/roles" class="btn btn-default">
+  <a href="<?php echo $_DOMAIN; ?>admin/rolesCP" class="btn btn-default">
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
 </h3>
@@ -16,11 +16,11 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 
       $qry_change_role_to_user = "UPDATE user_auth SET roleName = '$roleName' WHERE idUser = '$idUser'";//Cap nhat quyen cua tai khoan
       if ($roleName == 'Owner') {
-          new Warning($_DOMAIN.'admin/roles','Quyền Owner là duy nhất. Vui lòng báo với quản trị viên nếu đó là lỗi.');
+          new Warning($_DOMAIN.'admin/rolesCP','Quyền Owner là duy nhất. Vui lòng báo với quản trị viên nếu đó là lỗi.');
       } else if ($idUser && $roleName) {
           $db->query($qry_change_role_to_user);
-          new Success($_DOMAIN.'admin/roles','Thay đổi phân quyền thành công');
-      } else new Warning($_DOMAIN.'admin/roles','Có lỗi xảy ra! Vui lòng kiểm tra lại hoặc báo cáo với kỹ thuật viên.');
+          new Success($_DOMAIN.'admin/rolesCP','Thay đổi phân quyền thành công');
+      } else new Warning($_DOMAIN.'admin/rolesCP','Có lỗi xảy ra! Vui lòng kiểm tra lại hoặc báo cáo với kỹ thuật viên.');
   }
 ?>
 
@@ -72,8 +72,8 @@ $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => $_DOMAIN.'admin/roles/{page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => $_DOMAIN.'admin/roles',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/rolesCP/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/rolesCP',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -92,7 +92,7 @@ echo $paging->html();
 //         if (isset($_GET['act'])) {
 //           if ($_GET["act"]) {
 //             $id=$_GET['act'];
-//             echo '       <form action="'.$_DOMAIN.'admin/roles" method="post">
+//             echo '       <form action="'.$_DOMAIN.'admin/rolesCP" method="post">
 //                               <fieldset class="form-group">
 //                                   <label for="roleThisUser">Phân quyền thành viên</label>
 //                                   <select class="form-control" name="roleThisUser" id="roleThisUser">';
@@ -108,8 +108,8 @@ echo $paging->html();
 //             ';
 //           }
 //         }
-//       } else new Redirect($_DOMAIN.'admin/roles');
-//     } else new Redirect($_DOMAIN.'admin/roles');
+//       } else new Redirect($_DOMAIN.'admin/rolesCP');
+//     } else new Redirect($_DOMAIN.'admin/rolesCP');
 //
 // if (isset($_POST['changeRole'])){
 //   $role = $_POST['roleThisUser'];
@@ -117,7 +117,7 @@ echo $paging->html();
 //   if ($role) {
 //     $sql_update_role = "UPDATE rolesName FROM user_auth WHERE idUser = '$id'";
 //     $db->query($sql_update_role);
-//     new Redirect($_DOMAIN.'admin/roles');
+//     new Redirect($_DOMAIN.'admin/rolesCP');
 //   }
 // }
 
@@ -131,7 +131,7 @@ echo $paging->html();
         <h4 class="modal-title">Thay đổi quyền</h4>
       </div>
       <div class="modal-body edit-content">
-          <form class="form-group" action="<?php echo $_DOMAIN; ?>admin/roles" method="post">
+          <form class="form-group" action="<?php echo $_DOMAIN; ?>admin/rolesCP" method="post">
             <input type="hidden" name="toIdUser" id="toIdUser" value=""/>
               <fieldset class="form-group">
                   <label for="roleChange">Tên quyền</label>

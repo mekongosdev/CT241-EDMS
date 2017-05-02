@@ -41,13 +41,13 @@
                 <i class="glyphicon glyphicon-list-alt"></i> Thao tác quản lý
             </button>
             <ul class="dropdown-menu">
-                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "device") echo ' class="active"'; else echo ''; else echo ''; ?>>
-                    <a href="<?php echo $_DOMAIN; ?>admin/device">
+                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "deviceCP") echo ' class="active"'; else echo ''; else echo ''; ?>>
+                    <a href="<?php echo $_DOMAIN; ?>admin/deviceCP">
                         <span class="glyphicon glyphicon-list-alt"></span> Quản lý thiết bị
                     </a>
                 </li>
-                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "members") echo ' class="active"'; else echo ''; else echo ''; ?>>
-                    <a href="<?php echo $_DOMAIN; ?>admin/members">
+                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "membersCP") echo ' class="active"'; else echo ''; else echo ''; ?>>
+                    <a href="<?php echo $_DOMAIN; ?>admin/membersCP">
                         <span class="glyphicon glyphicon-user"></span> Quản lý thành viên
                     </a>
                 </li>
@@ -56,71 +56,75 @@
                         <span class="glyphicon glyphicon-lock"></span> Quản lý tài khoản
                     </a>
                 </li>
-                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "labs") echo ' class="active"'; else echo ''; else echo ''; ?>>
-                    <a href="<?php echo $_DOMAIN; ?>admin/labs">
+                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "labsCP") echo ' class="active"'; else echo ''; else echo ''; ?>>
+                    <a href="<?php echo $_DOMAIN; ?>admin/labsCP">
                         <span class="glyphicon glyphicon-list-alt"></span> Quản lý Labs
                     </a>
                 </li>
-                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "project") echo ' class="active"'; else echo ''; else echo ''; ?>>
-                    <a href="<?php echo $_DOMAIN; ?>admin/project">
+                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "projectCP") echo ' class="active"'; else echo ''; else echo ''; ?>>
+                    <a href="<?php echo $_DOMAIN; ?>admin/projectCP">
                         <span class="glyphicon glyphicon-list-alt"></span> Quản lý dự án
                     </a>
                 </li>
-                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "partner") echo ' class="active"'; else echo ''; else echo ''; ?>>
-                    <a href="<?php echo $_DOMAIN; ?>admin/producer">
+                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "producerCP") echo ' class="active"'; else echo ''; else echo ''; ?>>
+                    <a href="<?php echo $_DOMAIN; ?>admin/producerCP">
                         <span class="glyphicon glyphicon-list-alt"></span> Quản lý nhà cung cấp/sản xuất
                     </a>
                 </li>
-                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "images") echo ' class="active"'; else echo ''; else echo ''; ?>>
-                    <a href="<?php echo $_DOMAIN; ?>admin/images">
+                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "imagesCP") echo ' class="active"'; else echo ''; else echo ''; ?>>
+                    <a href="<?php echo $_DOMAIN; ?>admin/imagesCP">
                         <span class="glyphicon glyphicon-picture"></span> Quản lý hình ảnh
                     </a>
                 </li>
             </ul>
         </div>
 
-        <a class="list-group-item <?php if (isset($_GET["tab"])) if ($_GET["tab"] == "borrow") echo ' active'; else echo ''; else echo ''; ?>" href="<?php echo $_DOMAIN; ?>admin/borrow">
+        <a class="list-group-item <?php if (isset($_GET["tab"])) if ($_GET["tab"] == "borrowDeviceCP") echo ' active'; else echo ''; else echo ''; ?>" href="<?php echo $_DOMAIN; ?>admin/borrowDeviceCP">
             <span class="glyphicon glyphicon-check"></span> Mượn thiết bị
         </a>
 
-        <a class="list-group-item <?php if (isset($_GET["tab"])) if ($_GET["tab"] == "roles") echo ' active'; else echo ''; else echo ''; ?>" href="<?php echo $_DOMAIN; ?>admin/roles">
+        <a class="list-group-item <?php if (isset($_GET["tab"])) if ($_GET["tab"] == "rolesCP") echo ' active'; else echo ''; else echo ''; ?>" href="<?php echo $_DOMAIN; ?>admin/rolesCP">
             <span class="glyphicon glyphicon-sort"></span> Phân quyền
         </a>
 
-        <div class="dropdown">
-            <button class="list-group-item dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                <i class="glyphicon glyphicon-list-alt"></i> Cài đặt
-            </button>
-            <ul class="dropdown-menu">
-                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "setting") echo ' class="active"'; else echo ''; else echo ''; ?>>
-                    <a href="<?php echo $_DOMAIN; ?>admin/setting">
-                        <span class="glyphicon glyphicon-cog"></span> Cài đặt chung
-                    </a>
-                </li>
-                <li<?php if (isset($_GET["tab"])) if ($_GET["tab"] == "rolesCP") echo ' class="active"'; else echo ''; else echo ''; ?>>
-                    <a href="<?php echo $_DOMAIN; ?>admin/rolesCP">
-                        <span class="glyphicon glyphicon-cog"></span> Cài đặt phân quyền
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <a class="list-group-item <?php if (isset($_GET["tab"])) if ($_GET["tab"] == "settingCP") echo ' active'; else echo ''; else echo ''; ?>" href="<?php echo $_DOMAIN; ?>admin/settingCP">
+            <span class="glyphicon glyphicon-wrench"></span> Cài đặt chung
+        </a>
+
+
 
         <?php
 
         // Phân quyền sidebar
         // Nếu tài khoản là admin
-        // if ($data_user['roleName'] == 'Owner')
-        // {
-        //     echo
-        //     '
-        //         <a class="list-group-item" href="' . $_DOMAIN . 'categories">
-        //             <span class="glyphicon glyphicon-tag"></span> Chuyên mục
-        //         </a>
-        //         <a class="list-group-item" href="' . $_DOMAIN . 'setting">
-        //             <span class="glyphicon glyphicon-cog"></span> Cài đặt chung
-        //         </a>
-        //     ';
-        // }
+        if ($data_user['roleName'] == 'Owner')
+        {
+            echo
+            '
+            <div class="dropdown">
+                <button class="list-group-item dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <i class="glyphicon glyphicon-flag"></i>'." Super Admin's Feature".'
+                </button>
+                <ul class="dropdown-menu">
+                    <li ';if (isset($_GET["tab"])) if ($_GET["tab"] == "rolesAD") echo ' class="active"'; else echo ''; else echo ''; echo '>
+                        <a href="'.$_DOMAIN.'admin/rolesAD">
+                            <span class="glyphicon glyphicon-cog"></span> Cài đặt phân quyền
+                        </a>
+                    </li>
+                    <li ';if (isset($_GET["tab"])) if ($_GET["tab"] == "device") echo ' class="active"'; else echo ''; else echo ''; echo '>
+                        <a href="'.$_DOMAIN.'admin/urlCP">
+                            <span class="glyphicon glyphicon-share"></span> URL login
+                        </a>
+                    </li>
+                    <li ';if (isset($_GET["tab"])) if ($_GET["tab"] == "mail") echo ' class="active"'; else echo ''; else echo ''; echo '>
+                        <a href="'.$_DOMAIN.'admin/mailCP">
+                            <span class="glyphicon glyphicon-envelope"></span> Cài đặt mail
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            ';
+        }
 
         ?>
         <a class="list-group-item" href="<?php echo $_DOMAIN; ?>signout">

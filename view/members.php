@@ -2,6 +2,7 @@
 <?php
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);
 ?>
   <div><br  /></div>
 
@@ -19,14 +20,14 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                      $start=($_GET['tab']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
                 else $start=0;
                 // var_dump($start);
-                $val = "SELECT * FROM user_info a,user_auth b,images c WHERE (a.idUser = b.idUser) AND (a.idImg = c.idImg) ORDER BY a.idUser ASC limit $start,$row_per_page";
+                $val = "SELECT * FROM user_info a,user_auth b WHERE (a.idUser = b.idUser) ORDER BY a.idUser ASC limit $start,$row_per_page";
 
 
                 foreach ($db->fetch_assoc($val, 0) as $key => $row) {
                   echo '<div class="col-md-2">
                     <div class="panel panel-default">
                       <div class="panel-heading">
-                        <img src="'.$_DOMAIN.$row['url'].'" alt="User" style="width:150px;height:150px;">
+                        <img src="'.$_DOMAIN.$row['urlImg'].'" alt="User" style="width:150px;height:150px;">
                       </div>
                       <div class="panel-body">
                         <span>'.$row['idUser'].'</span><br />

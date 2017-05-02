@@ -3,11 +3,12 @@
 <?php
 
 // Nếu chưa đăng nhập
-if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);?>
 
 <h3>Quản lý Labs</h3>
   <button class="btn btn-success" data-toggle="modal" data-target="#addProject">Thêm Lab mới</button>
-  <a href="<?php echo $_DOMAIN; ?>admin/labs" class="btn btn-default">
+  <a href="<?php echo $_DOMAIN; ?>admin/labsCP" class="btn btn-default">
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
 
@@ -67,8 +68,8 @@ $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => $_DOMAIN.'admin/labs/{page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => $_DOMAIN.'admin/labs',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/labsCP/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/labsCP',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -89,7 +90,7 @@ echo $paging->html();
                     <h4 class="modal-title">Thêm Lab</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo $_DOMAIN; ?>admin/labs" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/labsCP" method="post">
                       <fieldset class="form-group">
                           <label for="labName">Tên Lab</label>
                           <input type="text" class="form-control" name="labName" id="labName" placeholder="Nhập tên Lab">
@@ -128,7 +129,7 @@ echo $paging->html();
                     <h4 class="modal-title">Chỉnh sửa Lab</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo $_DOMAIN; ?>admin/labs" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/labsCP" method="post">
                       <input type="hidden" name="toEditLab" id="toEditLab" value=""/>
                       <fieldset class="form-group">
                           <label for="labName">Tên Lab</label>
@@ -172,7 +173,7 @@ echo $paging->html();
                     <h4>Hành động này cần xác nhận: Không thể hoàn tác!</h4>
                     <p>Vui lòng kiểm tra cẩn thận!</p>
                   </center>
-                    <form action="<?php echo $_DOMAIN; ?>admin/labs" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/labsCP" method="post">
                         <div class="modal-footer">
                             <input type="hidden" name="toDelLab" id="toDelLab" value=""/>
                             <button type="submit" name="delLab" class="btn btn-danger">Đồng ý</button></form>
@@ -221,7 +222,7 @@ echo $paging->html();
        {
          $sql="INSERT INTO lab_info(nameLab,unit,phone,address,location) VALUES ('$labName','$labUnit','$labPhone','$labAddress','$labMap')";
          $query = $db->query($sql);
-         new Redirect($_DOMAIN.'admin/labs');
+         new Redirect($_DOMAIN.'admin/labsCP');
       } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
     }
     //Xử lý sửa thông tin Lab
@@ -236,8 +237,8 @@ echo $paging->html();
       if ($name && $unit && $phone && $address) {
           $sql_edit_lab = "UPDATE lab_info SET nameLab = '$name',unit = '$unit',phone = '$phone',address = '$address',location = '$location' WHERE idLab = '$idLab'";
           $db->query($sql_edit_lab);
-          new Success($_DOMAIN.'admin/labs/');
-      } else new Warning($_DOMAIN.'admin/labs','Vui lòng điền đầy đủ thông tin');
+          new Success($_DOMAIN.'admin/labsCP/');
+      } else new Warning($_DOMAIN.'admin/labsCP','Vui lòng điền đầy đủ thông tin');
     }
 
     //Xử lý xóa Lab
@@ -246,6 +247,6 @@ echo $paging->html();
 
       $sql_del_lab = "DELETE FROM lab_info WHERE idLab = '$idLab'";
       $db->query($sql_del_lab);
-      new Success($_DOMAIN.'admin/labs/');
+      new Success($_DOMAIN.'admin/labsCP/');
     }
 ?>

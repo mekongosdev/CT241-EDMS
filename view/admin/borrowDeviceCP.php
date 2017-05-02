@@ -1,6 +1,6 @@
 <?php // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
-
+new Role($roleUser);
 //Giới hạn thời gian mượn thiết bị
 // echo (day_limit($date_before,$date_current,12) == 1) ? 'OK' : 'Timeout';
 
@@ -8,8 +8,8 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 
 
 <h3>Quản lý mượn thiết bị</h3>
-<form action="<?php echo $_DOMAIN; ?>admin/borrow" method="POST">
-  <a href="<?php echo $_DOMAIN; ?>admin/borrow" class="btn btn-default">
+<form action="<?php echo $_DOMAIN; ?>admin/borrowDeviceCP" method="POST">
+  <a href="<?php echo $_DOMAIN; ?>admin/borrowDeviceCP" class="btn btn-default">
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
   <button class="btn btn-primary" name="requestOKBtn" type="submit"><span class="glyphicon glyphicon-ok"></span> Xác nhận mượn</button>
@@ -18,6 +18,166 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
   <button class="btn btn-warning" name="refreshOKBtn" type="submit"><span class="glyphicon glyphicon-refresh"></span> Gia hạn mượn</button>
 
 <h2>  </h2>
+
+<?php
+//Xử lý mượn thiết bị
+//Đồng ý
+if (isset($_POST['requestOK'])) {
+  $request = $_POST['toRequestDevice'];
+
+  $sql_request = "UPDATE borrow_device_detail SET statusBorrow = 1, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$request'";//status = 1 -> Accept
+  //GET thiết bị từ bảng mượn
+  $get_device = "SELECT * FROM device_info INNER JOIN borrow_device ON device_info.idDevice = borrow_device.idDevice WHERE borrow_device.idBorrowDevice = '$request'";
+  foreach ($db->fetch_assoc($get_device,0) as $key => $get_result) {
+    $totalDevice = $get_result['total'];
+    $idDevice = $get_result['idDevice'];
+  }
+
+  //Dem tong so thiet bi
+  $qry_totalBorrow = "SELECT totalBorrow FROM borrow_device WHERE idBorrowDevice = '$request'";
+  foreach ($db->fetch_assoc($qry_totalBorrow,1) as $key => $result) {
+    $totalBorrow = $result;
+  }
+  $totalNow = $totalDevice - $totalBorrow;
+  $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
+  if ($request) {
+    $db->query($sql_request);
+    $db->query($qry_totalDevice_now);
+  }
+  new Success($_DOMAIN.'admin/borrowDeviceCP');
+}
+if (isset($_POST['requestOKBtn'])) {
+  $request = $_POST['idBorrow'];
+
+  $sql_request = "UPDATE borrow_device_detail SET statusBorrow = 1, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$request'";//status = 1 -> Accept
+
+  //GET thiết bị từ bảng mượn
+  $get_device = "SELECT * FROM device_info INNER JOIN borrow_device ON device_info.idDevice = borrow_device.idDevice WHERE borrow_device.idBorrowDevice = '$request'";
+  foreach ($db->fetch_assoc($get_device,0) as $key => $get_result) {
+    $totalDevice = $get_result['total'];
+    $idDevice = $get_result['idDevice'];
+  }
+
+  //Dem tong so thiet bi
+  $qry_totalBorrow = "SELECT totalBorrow FROM borrow_device WHERE idBorrowDevice = '$request'";
+  foreach ($db->fetch_assoc($qry_totalBorrow,1) as $key => $result) {
+    $totalBorrow = $result;
+  }
+  $totalNow = $totalDevice - $totalBorrow;
+  $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
+  if ($request) {
+    $db->query($sql_request);
+    $db->query($qry_totalDevice_now);
+  }
+  new Success($_DOMAIN.'admin/borrowDeviceCP');
+}
+
+//Từ chối
+if (isset($_POST['requestCancel'])) {
+  $request = $_POST['toRequestDevice'];
+
+  $sql_request = "UPDATE borrow_device_detail SET statusBorrow = 2, dateBorrow = '$date_current', dateReturn = '$date_current' WHERE idBorrowDeviceDetail = '$request'";//status = 2 -> Cancel
+  $db->query($sql_request);
+  new Danger($_DOMAIN.'admin/borrowDeviceCP','Từ chối thành công');
+}
+if (isset($_POST['requestCancelBtn'])) {
+  $request = $_POST['idBorrow'];
+
+  $sql_request = "UPDATE borrow_device_detail SET statusBorrow = 2, dateBorrow = '$date_current', dateReturn = '$date_current' WHERE idBorrowDeviceDetail = '$request'";//status = 2 -> Cancel
+  $db->query($sql_request);
+  new Danger($_DOMAIN.'admin/borrowDeviceCP','Từ chối thành công');
+}
+
+//Xử lý trả thiết bị
+if (isset($_POST['returnOK'])) {
+  $return = $_POST['toReturnDevice'];
+
+  $sql_return = "UPDATE borrow_device_detail SET statusBorrow = 3, dateReturn = '$date_current' WHERE idBorrowDeviceDetail = '$return'";//status = 3 -> Returned
+
+  //GET thiết bị từ bảng mượn
+  $get_device = "SELECT * FROM device_info INNER JOIN borrow_device ON device_info.idDevice = borrow_device.idDevice WHERE borrow_device.idBorrowDevice = '$return'";
+  foreach ($db->fetch_assoc($get_device,0) as $key => $get_result) {
+    $totalDevice = $get_result['total'];
+    $idDevice = $get_result['idDevice'];
+  }
+
+  //Dem tong so thiet bi đang mượn
+  $qry_totalBorrow = "SELECT totalBorrow FROM borrow_device WHERE idBorrowDevice = '$return'";
+  foreach ($db->fetch_assoc($qry_totalBorrow,1) as $key => $result) {
+    $totalBorrow_return = $result;
+  }
+  $totalNow = $totalDevice + $totalBorrow_return;
+  $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
+  if ($return) {
+    $db->query($sql_return);
+    $db->query($qry_totalDevice_now);
+  }
+  new Success($_DOMAIN.'admin/borrowDeviceCP');
+}
+if (isset($_POST['returnOKBtn'])) {
+  $return = $_POST['idBorrow'];
+
+  $sql_return = "UPDATE borrow_device_detail SET statusBorrow = 3, dateReturn = '$date_current' WHERE idBorrowDeviceDetail = '$return'";//status = 3 -> Returned
+
+  //GET thiết bị từ bảng mượn
+  $get_device = "SELECT * FROM device_info INNER JOIN borrow_device ON device_info.idDevice = borrow_device.idDevice WHERE borrow_device.idBorrowDevice = '$return'";
+  foreach ($db->fetch_assoc($get_device,0) as $key => $get_result) {
+    $totalDevice = $get_result['total'];
+    $idDevice = $get_result['idDevice'];
+  }
+
+  //Dem tong so thiet bi đang mượn
+  $qry_totalBorrow = "SELECT totalBorrow FROM borrow_device WHERE idBorrowDevice = '$return'";
+  foreach ($db->fetch_assoc($qry_totalBorrow,1) as $key => $result) {
+    $totalBorrow_return = $result;
+  }
+  $totalNow = $totalDevice + $totalBorrow_return;
+  $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
+  if ($return) {
+    $db->query($sql_return);
+    $db->query($qry_totalDevice_now);
+  }
+  new Success($_DOMAIN.'admin/borrowDeviceCP');
+}
+
+//Xử lý gia hạn thiết bị
+if (isset($_POST['refreshOK'])) {
+  $refresh = $_POST['toRefreshDevice'];
+
+  $sql_refresh = "UPDATE borrow_device_detail SET statusBorrow = 1, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$refresh'";//status = 1 -> Accept
+  if ($refresh) {
+    $db->query($sql_refresh);
+  }
+  new Success($_DOMAIN.'admin/borrowDeviceCP');
+}
+if (isset($_POST['refreshOKBtn'])) {
+  $refresh = $_POST['idBorrow'];
+
+  $sql_refresh = "UPDATE borrow_device_detail SET statusBorrow = 1, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$refresh'";//status = 1 -> Accept
+  if ($refresh) {
+    $db->query($sql_refresh);
+  }
+  new Success($_DOMAIN.'admin/borrowDeviceCP');
+}
+
+//Update người mượn quá hạn
+///Khai báo các giá trị limit
+$date_before = '';
+$date_after = $date_current;
+$limit = $limitBorrow;
+$sql_borrow_out_of_date = "SELECT * FROM borrow_device_detail WHERE statusBorrow = 1";
+foreach ($db->fetch_assoc($sql_borrow_out_of_date,0) as $key => $date) {
+  $date_before = $date['dateBorrow'];
+  $idBorrowDeviceDetail = $date['idBorrowDeviceDetail'];
+  if (day_limit($date_before,$date_after,$limit) == 0) {
+    $sql_update_status = "UPDATE borrow_device_detail SET statusBorrow = 4 WHERE idBorrowDeviceDetail = '$idBorrowDeviceDetail'";
+    $db->query($sql_update_status);
+  }
+}
+
+
+
+?>
 
 <table id="infoBorrow" class="table table-striped">
         <thead>
@@ -46,24 +206,245 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
               if(isset($_GET['act']) && (int)$_GET['act'])
                    $start=($_GET['act']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
               else $start=0;
-              // var_dump($start);
-              $val = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice) ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
 
-              foreach ($db->fetch_assoc($val, 0) as $key => $row) {
-                echo '<tr>
-                    <td><input type="radio" name="idBorrow" value="' . $row['idBorrowDeviceDetail'] .'"></td>
-                    <td>'.$row['idBorrowDeviceDetail'].'</td>
-                    <td>'.$row['fullName'].'</td>
-                    <td>'.$row['nameDevice'].'</td>
-                    <td>'.$row['totalBorrow'].'</td>
-                    <td>'.$row['dateBorrow'].'</td>
-                    <td>'.$row['dateReturn'].'</td>
-                    <td>
-                        <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
-                        <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
-                        <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
-                    </td>
-                </tr>';
+              //Hiển thị đã quá hạn
+              $val_out_date = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice) AND a.statusBorrow = 4 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+
+              if ($db->num_rows($val_out_date)){
+                foreach ($db->fetch_assoc($val_out_date, 0) as $key => $row) {
+                  $get_status = $row['statusBorrow'];
+                  // echo $get_status.' ';Test biến get status
+                  echo '<tr'; if ($get_status == 2) {
+                    echo ' class="alert alert-danger"';
+                  } else if ($get_status == 4) {
+                    echo ' class="alert alert-warning"';
+                  }
+                  echo '>
+                      <td>'; if ($get_status == 0 || $get_status == 1 || $get_status == 4) {
+                        echo '<input type="radio" name="idBorrow" value="' . $row['idBorrowDeviceDetail'] .'">';
+                      } echo '</td>
+                      <td>'.$row['idBorrowDeviceDetail'].'</td>
+                      <td>'.$row['fullName'].'</td>
+                      <td>'.$row['nameDevice'].'</td>
+                      <td>'.$row['totalBorrow'].'</td>';
+                      if ($get_status == 0 || $get_status == 1) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    } else if ($get_status == 2) {
+                      echo '<td>Đã từ chối</td><td> </td><td> </td>';
+                    } else if ($get_status == 3) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td> </td>';
+                    } else if ($get_status == 4) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>Đã quá hạn</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    }
+                      echo '
+                  </tr>';
+                }
+              }
+
+              //Hiển thị đang chờ duyệt
+              $val_wating = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 0 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+
+              if ($db->num_rows($val_wating)) {
+                foreach ($db->fetch_assoc($val_wating, 0) as $key => $row) {
+                  $get_status = $row['statusBorrow'];
+                  // echo $get_status.' ';Test biến get status
+                  echo '<tr'; if ($get_status == 2) {
+                    echo ' class="alert alert-danger"';
+                  } else if ($get_status == 4) {
+                    echo ' class="alert alert-warning"';
+                  }
+                  echo '>
+                      <td>'; if ($get_status == 0 || $get_status == 1 || $get_status == 4) {
+                        echo '<input type="radio" name="idBorrow" value="' . $row['idBorrowDeviceDetail'] .'">';
+                      } echo '</td>
+                      <td>'.$row['idBorrowDeviceDetail'].'</td>
+                      <td>'.$row['fullName'].'</td>
+                      <td>'.$row['nameDevice'].'</td>
+                      <td>'.$row['totalBorrow'].'</td>';
+                      if ($get_status == 0 || $get_status == 1) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    } else if ($get_status == 2) {
+                      echo '<td>Đã từ chối</td><td> </td><td> </td>';
+                    } else if ($get_status == 3) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td> </td>';
+                    } else if ($get_status == 4) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>Đã quá hạn</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    }
+                      echo '
+                  </tr>';
+                }
+              }
+
+              //Hiển thị đang mượn
+              $val_borrow = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 1 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+
+              if ($db->num_rows($val_borrow)) {
+                foreach ($db->fetch_assoc($val_borrow, 0) as $key => $row) {
+                  $get_status = $row['statusBorrow'];
+                  // echo $get_status.' ';Test biến get status
+                  echo '<tr'; if ($get_status == 2) {
+                    echo ' class="alert alert-danger"';
+                  } else if ($get_status == 4) {
+                    echo ' class="alert alert-warning"';
+                  }
+                  echo '>
+                      <td>'; if ($get_status == 0 || $get_status == 1 || $get_status == 4) {
+                        echo '<input type="radio" name="idBorrow" value="' . $row['idBorrowDeviceDetail'] .'">';
+                      } echo '</td>
+                      <td>'.$row['idBorrowDeviceDetail'].'</td>
+                      <td>'.$row['fullName'].'</td>
+                      <td>'.$row['nameDevice'].'</td>
+                      <td>'.$row['totalBorrow'].'</td>';
+                      if ($get_status == 0 || $get_status == 1) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    } else if ($get_status == 2) {
+                      echo '<td>Đã từ chối</td><td> </td><td> </td>';
+                    } else if ($get_status == 3) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td> </td>';
+                    } else if ($get_status == 4) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>Đã quá hạn</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    }
+                      echo '
+                  </tr>';
+                }
+              }
+
+              //Hiển thị đã trả
+              $val_return = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 3 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+
+              if ($db->num_rows($val_return)) {
+                foreach ($db->fetch_assoc($val_return, 0) as $key => $row) {
+                  $get_status = $row['statusBorrow'];
+                  // echo $get_status.' ';Test biến get status
+                  echo '<tr'; if ($get_status == 2) {
+                    echo ' class="alert alert-danger"';
+                  } else if ($get_status == 4) {
+                    echo ' class="alert alert-warning"';
+                  }
+                  echo '>
+                      <td>'; if ($get_status == 0 || $get_status == 1 || $get_status == 4) {
+                        echo '<input type="radio" name="idBorrow" value="' . $row['idBorrowDeviceDetail'] .'">';
+                      } echo '</td>
+                      <td>'.$row['idBorrowDeviceDetail'].'</td>
+                      <td>'.$row['fullName'].'</td>
+                      <td>'.$row['nameDevice'].'</td>
+                      <td>'.$row['totalBorrow'].'</td>';
+                      if ($get_status == 0 || $get_status == 1) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    } else if ($get_status == 2) {
+                      echo '<td>Đã từ chối</td><td> </td><td> </td>';
+                    } else if ($get_status == 3) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td> </td>';
+                    } else if ($get_status == 4) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>Đã quá hạn</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    }
+                      echo '
+                  </tr>';
+                }
+              }
+
+              //Hiển thị bị từ chối
+              $val_cancel = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 2 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+
+              if ($db->num_rows($val_cancel)) {
+                foreach ($db->fetch_assoc($val_cancel, 0) as $key => $row) {
+                  $get_status = $row['statusBorrow'];
+                  // echo $get_status.' ';Test biến get status
+                  echo '<tr'; if ($get_status == 2) {
+                    echo ' class="alert alert-danger"';
+                  } else if ($get_status == 4) {
+                    echo ' class="alert alert-warning"';
+                  }
+                  echo '>
+                      <td>'; if ($get_status == 0 || $get_status == 1 || $get_status == 4) {
+                        echo '<input type="radio" name="idBorrow" value="' . $row['idBorrowDeviceDetail'] .'">';
+                      } echo '</td>
+                      <td>'.$row['idBorrowDeviceDetail'].'</td>
+                      <td>'.$row['fullName'].'</td>
+                      <td>'.$row['nameDevice'].'</td>
+                      <td>'.$row['totalBorrow'].'</td>';
+                      if ($get_status == 0 || $get_status == 1) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    } else if ($get_status == 2) {
+                      echo '<td>Đã từ chối</td><td> </td><td> </td>';
+                    } else if ($get_status == 3) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>'.$row['dateReturn'].'</td>
+                      <td> </td>';
+                    } else if ($get_status == 4) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>Đã quá hạn</td>
+                      <td>
+                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisborrowRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    }
+                      echo '
+                  </tr>';
+                }
               }
           } else {
               echo '<br><br><div class="alert alert-info">Chưa có yêu cầu mượn nào.</div>';
@@ -80,8 +461,8 @@ $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => $_DOMAIN.'admin/borrow/{page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => $_DOMAIN.'admin/borrow',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/borrowDeviceCP/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/borrowDeviceCP',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -106,7 +487,7 @@ echo $paging->html();
                 <h4><strong>Cho phép mượn thiết bị?</strong></h4>
               </center>
             </div>
-            <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>admin/borrow" method="post">
+            <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>admin/borrowDeviceCP" method="post">
                 <input type="hidden" name="toRequestDevice" id="toRequestDevice" value=""/>
                 <button type="submit" name="requestOK" class="btn btn-primary">Đồng ý</button>
                 <button type="submit" name="requestCancel" class="btn btn-danger">Từ chối</button></form>
@@ -123,7 +504,7 @@ echo $paging->html();
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Xác nhận trả thiết bị</h4>
             </div>
-            <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>admin/borrow" method="post">
+            <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>admin/borrowDeviceCP" method="post">
                 <input type="hidden" name="toReturnDevice" id="toReturnDevice" value=""/>
                 <button type="submit" name="returnOK" class="btn btn-primary">Đồng ý</button></form>
             </div>
@@ -139,7 +520,7 @@ echo $paging->html();
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Gia hạn mượn thiết bị</h4>
             </div>
-            <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>admin/borrow" method="post">
+            <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>admin/borrowDeviceCP" method="post">
                 <input type="hidden" name="toRefreshDevice" id="toRefreshDevice" value=""/>
                 <button type="submit" name="refreshOK" class="btn btn-primary">Đồng ý</button></form>
             </div>
@@ -165,59 +546,3 @@ $('#borrowRefresh').on('show.bs.modal', function(e) {
   $("#toRefreshDevice").val(product);
 });
 </script>
-
-<?php
-//Xử lý mượn thiết bị
-//Đồng ý
-if (isset($_POST['requestOK'])) {
-  $request = $_POST['toRequestDevice'];
-
-  $sql_request = "UPDATE borrow_device_detail SET status = 1, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$request'";//status = 1 -> Accept
-  $db->query($sql_request);
-  new Success($_DOMAIN.'admin/borrow');
-}
-if (isset($_POST['requestOKBtn'])) {
-  $request = $_POST['idBorrow'];
-
-  $sql_request = "UPDATE borrow_device_detail SET status = 1, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$request'";//status = 1 -> Accept
-  $db->query($sql_request);
-  new Success($_DOMAIN.'admin/borrow');
-}
-
-//Từ chối
-if (isset($_POST['requestCancel'])) {
-  $request = $_POST['toRequestDevice'];
-
-  $sql_request = "UPDATE borrow_device_detail SET status = 2, dateBorrow = 'yyyy-mm-dd hh:mm:ss', dateReturn = 'yyyy-mm-dd hh:mm:ss' WHERE idBorrowDeviceDetail = '$request'";//status = 2 -> Cancel
-  $db->query($sql_request);
-  new Danger($_DOMAIN.'admin/borrow','Từ chối thành công');
-}
-if (isset($_POST['requestCancelBtn'])) {
-  $request = $_POST['idBorrow'];
-
-  $sql_request = "UPDATE borrow_device_detail SET status = 2, dateBorrow = 'yyyy-mm-dd hh:mm:ss', dateReturn = 'yyyy-mm-dd hh:mm:ss' WHERE idBorrowDeviceDetail = '$request'";//status = 2 -> Cancel
-  $db->query($sql_request);
-  new Danger($_DOMAIN.'admin/borrow','Từ chối thành công');
-}
-
-//Xử lý trả thiết bị
-// if (isset($_POST['returnOK'])) {
-//   $return = $_POST['toReturnDevice'];
-//
-// }
-// if (isset($_POST['returnOKBtn'])) {
-//   $return = $_POST['idBorrow'];
-//
-// }
-
-//Xử lý trả thiết bị
-// if (isset($_POST['refreshOK'])) {
-//   $refresh = $_POST['toRefreshDevice'];
-//
-// }
-// if (isset($_POST['refreshOKBtn'])) {
-//   $refresh = $_POST['idBorrow'];
-//
-// }
-
-?>

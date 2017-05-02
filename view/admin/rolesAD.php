@@ -1,8 +1,14 @@
 <a href="#" class="buttonFixed addBrg" data-toggle="modal" data-target="#addRole"></a>
 
+<?php
+// Nếu chưa đăng nhập
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);
+?>
+
 <h3>Tùy biến phân quyền</h3>
   <button class="btn btn-success" data-toggle="modal" data-target="#addRole">Thêm nhóm quyền</button>
-  <a href="<?php echo $_DOMAIN; ?>admin/rolesCP" class="btn btn-default">
+  <a href="<?php echo $_DOMAIN; ?>admin/rolesAD" class="btn btn-default">
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
   <button class="btn btn-danger" data-toggle="modal" data-target="#delRole">Xóa nhóm quyền đang xem</button>
@@ -18,7 +24,7 @@ $(document).ready(function() {
 </script>
 
 <h4>Tên nhóm quyền</h4>
-<form class="form-horizontal" action="<?php echo $_DOMAIN; ?>admin/rolesCP" method="post">
+<form class="form-horizontal" action="<?php echo $_DOMAIN; ?>admin/rolesAD" method="post">
   <div class="form-group">
     <div class="col-sm-6">
       <select class="form-control" name="roleThisUser" id="roleThisUser">
@@ -52,7 +58,7 @@ if(isset($_POST['goRole'])) {
         <h4 class="modal-title">Xóa nhóm quyền</h4>
       </div>
       <div class="modal-body">
-        <form action="<?php echo $_DOMAIN; ?>admin/rolesCP" method="post">
+        <form action="<?php echo $_DOMAIN; ?>admin/rolesAD" method="post">
             <input type="hidden" name="toRole" id="toRole" value="<?php echo $roleNamecp; ?>"/>
             <center>
                 <h5>Bạn đang xóa quyền <?php echo $roleNamecp; ?>! Hành động này không thể hoàn tác.</h5>
@@ -74,10 +80,10 @@ if (isset($_POST['delThisRole'])) {
   $sql_del_roleName = "DELETE FROM `roles_cp` WHERE roleName = '$delRole'";
 
   if ($delRole == 'Owner') {
-      new Warning($_DOMAIN.'admin/rolesCP','Không thể xóa quyền Owner. Vui lòng báo với quản trị viên nếu đó là lỗi.');
+      new Warning($_DOMAIN.'admin/rolesAD','Không thể xóa quyền Owner. Vui lòng báo với quản trị viên nếu đó là lỗi.');
   } else {
       $db->query($sql_del_roleName);
-      new Success($_DOMAIN.'admin/rolesCP','Xóa quyền thành công');
+      new Success($_DOMAIN.'admin/rolesAD','Xóa quyền thành công');
   }
 }
 ?>
@@ -92,7 +98,7 @@ if (isset($_POST['delThisRole'])) {
         <h4 class="modal-title">Thêm nhóm quyền</h4>
       </div>
       <div class="modal-body">
-        <form class="form-horizontal" action="<?php echo $_DOMAIN; ?>admin/rolesCP" method="post">
+        <form class="form-horizontal" action="<?php echo $_DOMAIN; ?>admin/rolesAD" method="post">
           <div class="form-group">
             <label class="control-label col-sm-3" for="roleName">Tên nhóm quyền</label>
             <div class="col-sm-9">
@@ -119,7 +125,7 @@ if (isset($_POST['delThisRole'])) {
   if(isset($_POST['addNewRole'])){
     if($_POST['roleName'] == NULL||$_POST['roleDescription'] == NULL)
      {
-      new Warning($_DOMAIN.'admin/rolesCP','Vui lòng nhập tên quyền hoặc mô tả nhóm quyền còn bỏ trống');
+      new Warning($_DOMAIN.'admin/rolesAD','Vui lòng nhập tên quyền hoặc mô tả nhóm quyền còn bỏ trống');
      }
      else
      {
@@ -130,7 +136,7 @@ if (isset($_POST['delThisRole'])) {
        {
          $sql="INSERT INTO roles_cp(roleName,roleDesc,rolesGroup) VALUES('".$roleName."','".$roleDescription."','profile')";
          $query = $db->query($sql);
-         new Warning($_DOMAIN.'admin/rolesCP','Đã thêm thành công quyền mới với chức năng mặc định là Profile - Xem thông tin thành viên!');
+         new Warning($_DOMAIN.'admin/rolesAD','Đã thêm thành công quyền mới với chức năng mặc định là Profile - Xem thông tin thành viên!');
       }
     }
 
@@ -153,16 +159,7 @@ if($total_found >0)
     }
 }
 
-//Hàm phân quyền
-function role($role) {
-	if(in_array("fullcontrol",$role)||in_array("adminCP",$role)){
-		echo "Access!";
-	} else echo "Deny!";
-}
-echo "<br  />";
-role($role);
 
-    //echo $role;
 if(isset($_POST['saveRole'])) {
     $all_value = implode(",",$_POST['add']);
     $name = $_POST['disabled'];
@@ -173,7 +170,7 @@ if(isset($_POST['saveRole'])) {
         //update
         $upd_qry="UPDATE roles_cp SET rolesGroup='".$all_value."', roleDesc='".$roleDesc."' WHERE roleName='".$name."'";
         $db->query($upd_qry);
-        new Success($_DOMAIN.'admin/rolesCP','Thành công!');
+        new Success($_DOMAIN.'admin/rolesAD','Thành công!');
   } else
     {
         //insert
@@ -183,7 +180,7 @@ if(isset($_POST['saveRole'])) {
 }
 ?>
 
-<form class="form-horizontal" action="<?php echo $_DOMAIN; ?>admin/rolesCP" method="post">
+<form class="form-horizontal" action="<?php echo $_DOMAIN; ?>admin/rolesAD" method="post">
   <div class="form-group">
     <div class="col-sm-10 roles-admin">
         <input class="hidden" name="disabled" id="disabledInput" type="text" value="<?php echo $roleNamecp;?>">
@@ -226,7 +223,12 @@ if(isset($_POST['saveRole'])) {
           <input type="checkbox" name='add[]' value="labs" <?php if(in_array("labs",$role)){echo "checked";}?>>Xem danh sách Labs<br />
           <input type="checkbox" name='add[]' value="profile" <?php if(in_array("profile",$role)){echo "checked";}?>>Xem thông tin thành viên<br />
           <input type="checkbox" name='add[]' value="search" <?php if(in_array("search",$role)){echo "checked";}?>>Sử dụng Tìm kiếm<br />
-          <input type="checkbox" name='add[]' value="adminCP" <?php if(in_array("adminCP",$role)){echo "checked";}?>>Truy cập AdminCP<br />
+          <input type="checkbox" name='add[]' value="dashboard" <?php if(in_array("dashboard",$role)){echo "checked";}?>>Truy cập AdminCP<br />
+          <p><strong>Nhóm quyền SAF</strong></p>
+          <input type="checkbox" name='add[]' value="rolesAD" <?php if(in_array("rolesAD",$role)){echo "checked";}?>>Quản lý nhóm quyền<br />
+          <input type="checkbox" name='add[]' value="account" <?php if(in_array("account",$role)){echo "checked";}?>>Quản lý tài khoản<br />
+          <input type="checkbox" name='add[]' value="mailCP" <?php if(in_array("mailCP",$role)){echo "checked";}?>>Quản lý tính năng email<br />
+          <input type="checkbox" name='add[]' value="urlCP" <?php if(in_array("urlCP",$role)){echo "checked";}?>>Quản lý tính năng URL<br />
         </div>
         <div class="col-sm-4">
           <p><strong>Nhóm quyền thêm/xóa</strong></p>
@@ -249,13 +251,13 @@ if(isset($_POST['saveRole'])) {
           <input type="checkbox" name='add[]' value="membersCP" <?php if(in_array("membersCP",$role)){echo "checked";}?>>Quản lý thành viên<br />
           <input type="checkbox" name='add[]' value="projectCP" <?php if(in_array("projectCP",$role)){echo "checked";}?>>Quản lý dự án<br />
           <input type="checkbox" name='add[]' value="labsCP" <?php if(in_array("labsCP",$role)){echo "checked";}?>>Quản lý Lab<br />
-          <input type="checkbox" name='add[]' value="partnerCP" <?php if(in_array("partnerCP",$role)){echo "checked";}?>>Quản lý đối tác<br />
+          <input type="checkbox" name='add[]' value="producerCP" <?php if(in_array("producerCP",$role)){echo "checked";}?>>Quản lý đối tác<br />
           <p><strong> * Nhóm quyền quản lý cao cấp</strong></p>
           <input type="checkbox" name='add[]' value="imagesCP" <?php if(in_array("imagesCP",$role)){echo "checked";}?>>Quản lý hình ảnh<br />
           <input type="checkbox" name='add[]' value="rolesCP" <?php if(in_array("rolesCP",$role)){echo "checked";}?>>Thay đổi quyền thành viên<br />
           <input type="checkbox" name='add[]' value="profileCP" <?php if(in_array("profileCP",$role)){echo "checked";}?>>Thay đổi thông tin thành viên<br />
-          <input type="checkbox" name='add[]' value="rolesAD" <?php if(in_array("rolesAD",$role)){echo "checked";}?>>Quản lý nhóm quyền<br />
           <input type="checkbox" name='add[]' value="settingCP" <?php if(in_array("settingCP",$role)){echo "checked";}?>>Quản lý cài đặt<br />
+          <input class="hidden"><br />
         </div>
         <input type="submit" class="btn btn-primary" name="saveRole" value="Lưu">
     </div>

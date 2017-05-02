@@ -6,7 +6,7 @@ foreach ($db->fetch_assoc($sql_get_setting, 0) as $key => $data) {
 } //print_r($value); Kiểm tra hoạt động mảng $value
 ?>
     <div class="header clearfix"></div>
-      <div class="footer div-center"><?php echo $value[4]; ?></div>
+      <div class="footer div-center"><?php echo $value[5]; ?></div>
 </body>
 <script>
 var i = 0;

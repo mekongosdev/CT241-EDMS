@@ -19,7 +19,7 @@ if(isset($_POST['id_login']) && isset($_POST['pwd_login'])) {
                 if ($db->num_rows($sql_check_stt)) {
                       // Lưu session
                       $session->send($id_user);
-                      $db->close(); // Giải phóng
+                      // $db->close(); // Giải phóng
 
                       new Success($_DOMAIN,'Đăng nhập thành công'); // Trở về trang index
                 } else {

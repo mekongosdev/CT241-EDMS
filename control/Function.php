@@ -260,7 +260,41 @@ Function date_to_date($date_before,$date_after) {
 Function day_limit($date_before,$date_after,$limit) {
   $recent = date_to_date($date_before,$date_after);
 
-  return ($recent <= $limit) ? 1 : 0;
+  return ($recent <= $limit) ? 1 : 0;//1 -> còn hạn <--> 0 -> quá hạn
+}
+
+//Hàm phân quyền
+// function role($roleUser) {
+//   if (isset($_GET['action'])) {
+//     if ($_GET['action'] == 'admin') {
+//       if (isset($_GET['tab'])){
+//         $area = $_GET['tab'];
+//
+//       }
+//     } else $area = $_GET['action'];
+//   }
+// 	if( in_array("fullcontrol",$roleUser)) { //|| in_array('device',$roleUser)
+//     new Success('','Bạn có quyền truy cập!');
+//   } else new Warning('','Bạn không có quyền truy cập!');
+// }
+class Role {
+    public function __construct($roleUser = null) {
+        // if ($url)
+        // {
+        //     echo '<script>location.href="'.$url.'";</script>';
+        // }
+        if (isset($_GET['action'])) {
+          if ($_GET['action'] == 'admin') {
+            $area = $_GET['action'];
+            if (isset($_GET['tab'])){
+              $area = $_GET['tab'];
+            }
+          } else $area = $_GET['action'];
+        }
+      	if( in_array("fullcontrol",$roleUser) || in_array($area,$roleUser)) {
+          // new Success('','Bạn có quyền truy cập!');
+        } else new Redirect('http://192.168.0.103/demo_ptycpm/');
+    }
 }
 
 ?>

@@ -3,10 +3,12 @@
 <?php
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);
 ?>
 
 <legend>
     <h1>Danh sách Thiết bị Nhúng</h1></legend>
+    <h5 class="alert alert-info">Mỗi thiết bị được mượn tối đa <?php echo $limitBorrow; ?> ngày</h5>
 <?php
   if (isset($_POST['newBorrowDevice'])) {
       $idDevice = $_POST['toIdDevice'];
@@ -26,13 +28,11 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
         $totalDevice = $result['total'];
       }
       $totalNow = $totalDevice - $total;
-      $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
       //Ghi nhan qua trinh muon
       $qry_borrow = "INSERT INTO borrow_device(idDevice,idProject,totalBorrow) VALUES ('$idDevice','$idProject','$total')";
-      $qry_borrow_detail = "INSERT INTO borrow_device_detail(idBorrowDevice,idUser,status) VALUES ('$idNewest','$user_borrow',0)";//status = 0 -> waiting accept
+      $qry_borrow_detail = "INSERT INTO borrow_device_detail(idBorrowDevice,idUser,statusBorrow) VALUES ('$idNewest','$user_borrow',0)";//status = 0 -> waiting accept
       if ($totalDevice > 0) {
           if ($total <= $totalDevice) {
-              $db->query($qry_totalDevice_now);
               $db->query($qry_borrow);
               $db->query($qry_borrow_detail);
               new Success($_DOMAIN.'device','Đăng ký mượn thành công');
@@ -122,6 +122,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
                   <fieldset class="form-group">
                       <label for="toProject">Cho dự án</label>
                       <select class="form-control" name="toProject" id="toProject">
+                        <option value="0">Cá nhân</option>
                         <?php
                             //Chọn dự án
                             $sql_project = "SELECT idProject,nameProject FROM project_info";

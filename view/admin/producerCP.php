@@ -1,13 +1,55 @@
 <?php // Nếu chưa đăng nhập
-if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);?>
 
 <a href="#" class="buttonFixed addBrg" data-toggle="modal" data-target="#addProducer"></a>
 
 <h3>Quản lý nhà cung cấp/sản xuất</h3>
   <button class="btn btn-success" data-toggle="modal" data-target="#addProducer">Thêm nhà cung cấp/sản xuất</button>
-  <a href="<?php echo $_DOMAIN; ?>admin/producer" class="btn btn-default">
+  <a href="<?php echo $_DOMAIN; ?>admin/producerCP" class="btn btn-default">
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
+
+  <?php
+  //Thêm nhà cung cấp
+    if(isset($_POST['add_Producer'])){
+      $producerName = addslashes($_POST['producerName']);
+      $serviceProducer = addslashes($_POST['serviceProducer']);
+      $phoneProducer = $_POST['phoneProducer'];
+      $addressProducer = addslashes($_POST['addressProducer']);
+      $mailProducer = addslashes($_POST['mailProducer']);
+      if($producerName && $serviceProducer && $phoneProducer && $addressProducer && $mailProducer)
+         {
+           $sql="INSERT INTO partner_info(nameProducer, service, address, phone, email) VALUES ('{$producerName}', '{$serviceProducer}', '{$addressProducer}', '{$phoneProducer}', '{$mailProducer}')";
+           $query = $db->query($sql);
+           new Success($_DOMAIN.'admin/producerCP/');
+       } else new Warning($_DOMAIN.'admin/producerCP','Vui lòng điền đầy đủ thông tin');
+      }
+      //Xử lý sửa thông tin nhà cung cấp
+      if (isset($_POST['editProducer'])) {
+        $idProducer = $_POST['toEditProducer'];
+        $name = $_POST['producerName'];
+        $service = $_POST['serviceProducer'];
+        $phone = $_POST['phoneProducer'];
+        $address = $_POST['addressProducer'];
+        $mail = $_POST['mailProducer'];
+
+        if ($name && $service && $phone && $address && $mail) {
+            $sql_edit_producer = "UPDATE partner_info SET nameProducer = '$name',service = '$service',address = '$address',phone = '$phone',email = '$mail' WHERE idProducer = '$idProducer'";
+            $db->query($sql_edit_producer);
+            new Success($_DOMAIN.'admin/producerCP/');
+        } else new Warning($_DOMAIN.'admin/producerCP','Vui lòng điền đầy đủ thông tin');
+      }
+
+      //Xử lý xóa nhà cung cấp
+      if (isset($_POST['delProducer'])) {
+        $idProducer = $_POST['toDelProducer'];
+
+        $sql_del_producer = "DELETE FROM partner_info WHERE idProducer = '$idProducer'";
+        $db->query($sql_del_producer);
+        new Success($_DOMAIN.'admin/producerCP/');
+      }
+  ?>
 
 <table id="infoProducer" class="table table-striped">
         <thead>
@@ -62,8 +104,8 @@ $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => $_DOMAIN.'admin/producer/{page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => $_DOMAIN.'admin/producer',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/producerCP/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/producerCP',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -84,7 +126,7 @@ echo $paging->html();
                     <h4 class="modal-title" id="">Thêm nhà cung cấp/sản xuất</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo $_DOMAIN; ?>admin/producer" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/producerCP" method="post">
                       <fieldset class="form-group">
                           <label for="producerName">Tên đối tác</label>
                           <input type="text" class="form-control" name="producerName" id="producerName" placeholder="Nhập tên đối tác">
@@ -123,7 +165,7 @@ echo $paging->html();
                     <h4 class="modal-title" id="">Chỉnh sửa nhà cung cấp/sản xuất</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo $_DOMAIN; ?>admin/producer" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/producerCP" method="post">
                       <input type="hidden" name="toEditProducer" id="toEditProducer" value=""/>
                       <fieldset class="form-group">
                           <label for="producerName">Tên đối tác</label>
@@ -168,10 +210,10 @@ echo $paging->html();
                   </center>
                 </div>
                 <div class="modal-footer">
-                  <form action="<?php echo $_DOMAIN; ?>admin/producer" method="post">
+                  <form action="<?php echo $_DOMAIN; ?>admin/producerCP" method="post">
                     <input type="hidden" name="toDelProducer" id="toDelProducer" value=""/>
-                            <button type="submit" name="delProducer" class="btn btn-danger">Đồng ý</button></form>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                            <button type="submit" name="delProducer" class="btn btn-danger">Đồng ý</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">No</button></form>
                     </div>
                 </div>
             </div>
@@ -196,49 +238,8 @@ echo $paging->html();
           $("#thismailProducer").val(mail);
         });
         //delMember
-        $('#deleteMember').on('show.bs.modal', function(e) {
+        $('#delProducer').on('show.bs.modal', function(e) {
           var product = $(e.relatedTarget).data('id');
           $("#toDelProducer").val(product);
         });
         </script>
-
-    <?php
-    //Thêm nhà cung cấp
-      if(isset($_POST['add_Producer'])){
-        $producerName = addslashes($_POST['producerName']);
-        $serviceProducer = addslashes($_POST['serviceProducer']);
-        $phoneProducer = $_POST['phoneProducer'];
-        $addressProducer = addslashes($_POST['addressProducer']);
-        $mailProducer = addslashes($_POST['mailProducer']);
-        if($producerName && $serviceProducer && $phoneProducer && $addressProducer && $mailProducer)
-           {
-             $sql="INSERT INTO partner_info(nameProducer, service, address, phone, email) VALUES ('{$producerName}', '{$serviceProducer}', '{$addressProducer}', '{$phoneProducer}', '{$mailProducer}')";
-             $query = $db->query($sql);
-             new Success($_DOMAIN.'admin/producer/');
-         } else new Warning($_DOMAIN.'admin/producer','Vui lòng điền đầy đủ thông tin');
-        }
-        //Xử lý sửa thông tin nhà cung cấp
-        if (isset($_POST['editProducer'])) {
-          $idProducer = $_POST['toEditProducer'];
-          $name = $_POST['producerName'];
-          $service = $_POST['serviceProducer'];
-          $phone = $_POST['phoneProducer'];
-          $address = $_POST['addressProducer'];
-          $mail = $_POST['mailProducer'];
-
-          if ($name && $service && $phone && $address && $mail) {
-              $sql_edit_producer = "UPDATE partner_info SET nameProducer = '$name',service = '$service',address = '$address',phone = '$phone',email = '$mail' WHERE idProducer = '$idProducer'";
-              $db->query($sql_edit_producer);
-              new Success($_DOMAIN.'admin/producer/');
-          } else new Warning($_DOMAIN.'admin/producer','Vui lòng điền đầy đủ thông tin');
-        }
-
-        //Xử lý xóa nhà cung cấp
-        if (isset($_POST['delProducer'])) {
-          $idProducer = $_POST['toDelMember'];
-
-          $sql_del_producer = "DELETE FROM partner_info WHERE idProducer = '$idProducer'";
-          $db->query($sql_del_producer);
-          new Success($_DOMAIN.'admin/producer/');
-        }
-    ?>

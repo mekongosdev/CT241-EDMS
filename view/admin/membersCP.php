@@ -1,11 +1,12 @@
 <a href="#" class="buttonFixed addBrg" data-toggle="modal" data-target="#addMember"></a>
 <?php
 // Nếu chưa đăng nhập
-if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap ?>
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);?>
 
 <h3>Quản lý thành viên</h3>
   <button class="btn btn-success" data-toggle="modal" data-target="#addMember">Thêm thành viên mới</button>
-  <a href="<?php echo $_DOMAIN; ?>admin/members" class="btn btn-default">
+  <a href="<?php echo $_DOMAIN; ?>admin/membersCP" class="btn btn-default">
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
 
@@ -61,8 +62,8 @@ $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => $_DOMAIN.'admin/members/{page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => $_DOMAIN.'admin/members',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/membersCP/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/membersCP',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -107,7 +108,7 @@ if (!$db->num_rows($sql_query_new_member)) {
                     <h4 class="modal-title">Thêm thành viên mới</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo $_DOMAIN; ?>admin/members" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/membersCP" method="post">
                         <fieldset class="form-group">
                             <label for="nameMember">Họ tên</label>
                             <input type="text" class="form-control" name="nameMember" id="nameMember" placeholder="Nhập tên thành viên">
@@ -157,7 +158,7 @@ if (!$db->num_rows($sql_query_new_member)) {
                     <h4 class="modal-title" id="">Chỉnh sửa thông tin</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo $_DOMAIN; ?>admin/members" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/membersCP" method="post">
                       <input type="hidden" name="toEditMember" id="toEditMember" value=""/>
                       <fieldset class="form-group">
                           <label for="positionMember">Vị trí nghiên cứu</label>
@@ -200,7 +201,7 @@ if (!$db->num_rows($sql_query_new_member)) {
                     <h4>Hành động này cần xác nhận: Không thể hoàn tác!</h4>
                     <p>Vui lòng kiểm tra cẩn thận!</p>
                   </center>
-                    <form action="<?php echo $_DOMAIN; ?>admin/members" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/membersCP" method="post">
                         <div class="modal-footer">
                             <input type="hidden" name="toDelMember" id="toDelMember" value=""/>
                             <button type="submit" name="delMember" class="btn btn-danger">Đồng ý</button></form>
@@ -247,7 +248,7 @@ if (isset($_POST['addNewMember'])) {
       $sql_add_user = "INSERT INTO user_info(idUser,idImg,fullName,phone,email,website,social,address,position,level,unit,type) VALUES ('$idUser',1,'$name','$phone','$email','không có','không có','ĐH Cần Thơ','$position','$level','Khoa CNTT&TT','$type')";
       $db->query($sql_add_user);
       new Success($_DOMAIN.'admin/account/');
-  } else new Warning($_DOMAIN.'admin/members','Vui lòng điền đầy đủ thông tin');
+  } else new Warning($_DOMAIN.'admin/membersCP','Vui lòng điền đầy đủ thông tin');
 }
 
 //Xử lý sửa thông tin thành viên
@@ -261,8 +262,8 @@ if (isset($_POST['editInfoMember'])) {
   if ($position && $level && $unit) {
       $sql_edit_user = "UPDATE user_info SET position = '$position',level = '$level',unit = '$unit',type = '$type' WHERE idUser = '$idUser'";
       $db->query($sql_edit_user);
-      new Success($_DOMAIN.'admin/members/');
-  } else new Warning($_DOMAIN.'admin/members','Vui lòng điền đầy đủ thông tin');
+      new Success($_DOMAIN.'admin/membersCP/');
+  } else new Warning($_DOMAIN.'admin/membersCP','Vui lòng điền đầy đủ thông tin');
 }
 
 //Xử lý xóa thành viên
@@ -271,6 +272,6 @@ if (isset($_POST['delMember'])) {
 
   $sql_del_user = "DELETE FROM user_info WHERE idUser = '$idUser'";
   $db->query($sql_del_user);
-  new Success($_DOMAIN.'admin/members/');
+  new Success($_DOMAIN.'admin/membersCP/');
 }
 ?>

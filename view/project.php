@@ -3,6 +3,7 @@
 <?php
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);
 ?>
     <legend>
         <h1>Danh sách Dự án</h1></legend>

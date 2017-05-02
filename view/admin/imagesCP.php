@@ -2,13 +2,14 @@
 <?php
 
 // Nếu chưa đăng nhập
-if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);?>
         <h3>Hình ảnh</h3>
-          <form action="<?php echo $_DOMAIN; ?>admin/images" method="POST">
+          <form action="<?php echo $_DOMAIN; ?>admin/imagesCP" method="POST">
             <a class="btn btn-default" data-toggle="modal" data-target="#addNewPhoto">
                 <span class="glyphicon glyphicon-plus"></span> Thêm
             </a>
-            <a href="<?php echo $_DOMAIN; ?>admin/images" class="btn btn-default">
+            <a href="<?php echo $_DOMAIN; ?>admin/imagesCP" class="btn btn-default">
                 <span class="glyphicon glyphicon-repeat"></span> Reload
             </a>
             <button class="btn btn-danger" id="del_img_list" name="delImages" type="submit">
@@ -19,25 +20,39 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
        //Xóa nhiều ảnh
         if (isset($_POST['delImages'])) {
         $id_img_del = $_POST['idImg'];
-        foreach ($id_img_del as $key => $data) {
-          $sql_query_name = "SELECT * FROM images WHERE idImg = '$data'";
-          foreach ($db->fetch_assoc($sql_query_name) as $key => $img_url) {
-            $sql_del_imgs = "DELETE FROM images WHERE url = '$img_url'";
-            $db->query($sql_del_imgs);
-          }
+        foreach ($id_img_del as $key => $id_img) {
+          $sql_check_id_img_exist = "SELECT * FROM images WHERE idImg = '$id_img'";
+            if ($db->num_rows($sql_check_id_img_exist))
+            {
+                $data_img = $db->fetch_assoc($sql_check_id_img_exist, 1);
+                if (file_exists($data_img['url']))
+                {
+                    unlink($data_img['url']);
+                }
+
+                $sql_delete_img = "DELETE FROM images WHERE idImg = '$id_img'";
+                $db->query($sql_delete_img);
+            }
         }
-        // new Success($_DOMAIN.'admin/images','Xóa các hình ảnh thành công');
+        new Success($_DOMAIN.'admin/imagesCP','Xóa các hình ảnh thành công');
         }
         //Xóa 1 ảnh
         if (isset($_POST['delImgOK'])) {
-        $idDel = $_POST['toDelImg'];
+        $id_img = $_POST['toDelImg'];
 
-        $sql_query_name = "SELECT * FROM images WHERE idImg = '$idDel'";
-        foreach ($db->fetch_assoc($sql_query_name) as $key => $img_url) {
-          $sql_del_img = "DELETE FROM images WHERE url = '$img_url'";
-          $db->query($sql_del_img);
-        }
-        // new Success($_DOMAIN.'admin/images','Xóa hình ảnh thành công');
+        $sql_check_id_img_exist = "SELECT * FROM images WHERE idImg = '$id_img'";
+          if ($db->num_rows($sql_check_id_img_exist))
+          {
+              $data_img = $db->fetch_assoc($sql_check_id_img_exist, 1);
+              if (file_exists($data_img['url']))
+              {
+                  unlink($data_img['url']);
+              }
+
+              $sql_delete_img = "DELETE FROM images WHERE idImg = '$id_img'";
+              $db->query($sql_delete_img);
+          }
+        new Success($_DOMAIN.'admin/imagesCP','Xóa hình ảnh thành công');
         }
 
       // Content danh sách hình ảnh
@@ -124,8 +139,8 @@ $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 12,// limit
-    'link_full'     => $_DOMAIN.'admin/images/{page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => $_DOMAIN.'admin/images',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/imagesCP/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/imagesCP',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -147,7 +162,7 @@ echo '<!-- Content chức năng tài khoản -->
         <h4 class="modal-title">Xóa tài khoản!</h4>
       </div>
       <div class="modal-body">
-      <form action="'.$_DOMAIN.'admin/images" method="POST">
+      <form action="'.$_DOMAIN.'admin/imagesCP" method="POST">
         <input type="hidden" name="toDelImg" id="toDelImg" value=""/>
         <center>
           <p><strong>Xác nhận xóa hình ảnh</strong></p>
@@ -173,7 +188,30 @@ echo '<!-- Content chức năng tài khoản -->
             new Warning('','File không được lớn hơn 10MB');
         } else {
             // Upload file
-            $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
+            // $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
+            // move_uploaded_file($source_img, $path_img); // Upload file
+            // $new_name_img = rename($path_img, $dir.$hour_current.$minute_current.$second_current.'_'.$day_current.$month_current.$year_current.'.'.$type_img);
+            // $url_img = $new_name_img; // Đường dẫn file
+
+            // Tạo folder năm hiện tại
+            if (!is_dir($dir.$year_current))
+            {
+                mkdir($dir.$year_current.'/');
+            }
+
+            // Tạo folder tháng hiện tại
+            if (!is_dir($dir.$year_current.'/'.$month_current))
+            {
+                mkdir($dir.$year_current.'/'.$month_current.'/');
+            }
+
+            // Tạo folder ngày hiện tại
+            if (!is_dir($dir.$year_current.'/'.$month_current.'/'.$day_current))
+            {
+                mkdir($dir.$year_current.'/'.$month_current.'/'.$day_current.'/');
+            }
+
+            $path_img = $dir.$year_current.'/'.$month_current.'/'.$day_current.'/'.$name_img; // Đường dẫn thư mục chứa file
             move_uploaded_file($source_img, $path_img); // Upload file
             $array = (explode(".",$name_img));
             $type_img = $array[1];// Loại file
@@ -182,7 +220,7 @@ echo '<!-- Content chức năng tài khoản -->
             // Thêm dữ liệu vào table
             $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
             $db->query($sql_up_file);
-            new Success($_DOMAIN.'admin/images','Upload ảnh thành công');
+            new Success($_DOMAIN.'admin/imagesCP','Upload ảnh thành công');
             }
           }
         }
@@ -213,7 +251,7 @@ $('#thisDelImg').on('show.bs.modal', function(e) {
       </div>
       <div class="modal-body">
         <div class="alert alert-info">Mỗi file có dung lượng không vượt quá 10MB và có đuôi định dạng là .jpg, .png.gif., </div>
-        <form method="post" action="<?php echo $_DOMAIN; ?>admin/images" class="form-group" id="formUpImg" enctype="multipart/form-data">
+        <form method="post" action="<?php echo $_DOMAIN; ?>admin/imagesCP" class="form-group" id="formUpImg" enctype="multipart/form-data">
                 <div class="form-group">
                   <label>Chọn hình ảnh</label>
                   <input type="file" class="form-control" accept="image/*" name="img_up[]" multiple="true" id="img_up_sc" onchange="preUpImg();"/>

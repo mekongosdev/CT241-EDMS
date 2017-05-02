@@ -3,11 +3,12 @@
 <?php
 
 // Nếu chưa đăng nhập
-if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap?>
+if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
+new Role($roleUser);?>
 
 <h3>Quản lý dự án</h3>
   <button class="btn btn-success" data-toggle="modal" data-target="#addProject">Thêm dự án mới</button>
-  <a href="<?php echo $_DOMAIN; ?>admin/project" class="btn btn-default">
+  <a href="<?php echo $_DOMAIN; ?>admin/projectCP" class="btn btn-default">
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
 
@@ -61,8 +62,8 @@ $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
     'limit'         => 10,// limit
-    'link_full'     => $_DOMAIN.'admin/project/{page}',// Link full có dạng như sau: domain/com/page/{page}
-    'link_first'    => $_DOMAIN.'admin/project',// Link trang đầu tiên
+    'link_full'     => $_DOMAIN.'admin/projectCP/{page}',// Link full có dạng như sau: domain/com/page/{page}
+    'link_first'    => $_DOMAIN.'admin/projectCP',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
 );
 
@@ -82,7 +83,7 @@ echo $paging->html();
                     <h4 class="modal-title">Thêm dự án</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo $_DOMAIN; ?>admin/project" method="post">
+                    <form action="<?php echo $_DOMAIN; ?>admin/projectCP" method="post">
                       <fieldset class="form-group">
                           <label for="projectName">Tên dự án</label>
                           <input type="text" class="form-control" name="projectName" id="projectName" placeholder="Nhập tên dự án">
@@ -223,7 +224,7 @@ echo $paging->html();
        {
          $sql="INSERT INTO project_info(idLab,nameProject,nameUser,nameStaff,dateStart) VALUES ('$projectLab','$projectName','$projectOwn','$projectGuide','$projectStart')";
          $query = $db->query($sql);
-         new Redirect($_DOMAIN.'admin/project');
+         new Redirect($_DOMAIN.'admin/projectCP');
       } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
     }
 ?>

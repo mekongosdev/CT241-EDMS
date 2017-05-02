@@ -1,7 +1,8 @@
 <?php
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
-else {
+new Role($roleUser);
+// else {
     if (isset($_GET['tab'])) {
       if ($_GET["tab"]) {
         $id=$_GET['tab'];
@@ -9,7 +10,7 @@ else {
     } else $id = $user;
 
     // Lấy dữ liệu tài khoản
-    $sql_get_data_user = "SELECT * FROM user_info a,user_auth b,images c WHERE (a.idUser = b.idUser) AND (a.idImg = c.idImg) AND (a.idUser = '$id')";
+    $sql_get_data_user = "SELECT * FROM user_info a,user_auth b WHERE (a.idUser = b.idUser) AND (a.idUser = '$id')";
     if ($db->num_rows($sql_get_data_user))
     {
         $data_user_profile = $db->fetch_assoc($sql_get_data_user, 1);
@@ -19,7 +20,7 @@ else {
     // {
     //     $data_user_avatar = $db->fetch_assoc($sql_get_data_avatar, 1);
     // }
-}
+// }
 ?>
 <div class="container">
   <center>
@@ -30,7 +31,7 @@ else {
             <p><strong><br /></strong></p>
             <center>
               <div class="col-sm-3">
-                <img class="profile-avatar" alt="200x200" src="<?php echo $_DOMAIN.$data_user_profile['url']; ?>" data-holder-rendered="true">
+                <img class="profile-avatar" alt="200x200" src="<?php echo $_DOMAIN.$data_user_profile['urlImg']; ?>" data-holder-rendered="true">
               </div>
               <div class="col-sm-4">
                 <br />
@@ -58,15 +59,17 @@ else {
             <span><strong>Đơn vị: </strong><?php echo $data_user_profile['unit']; ?></span><br  />
             <?php $name = $data_user_profile['fullName'];
             $sql_get_project = "SELECT * FROM project_info WHERE nameUser = '$name'";
-            $total_project = $db->num_rows($sql_get_project);
-            foreach ($db->fetch_assoc($sql_get_project, 0) as $key => $value_lab) {
-              $url_lab = $_DOMAIN.'labs/info/'.$value_lab['idLab'];
+
+            if ($db->num_rows($sql_get_project)) {
+              $total_project = $db->num_rows($sql_get_project);
+              foreach ($db->fetch_assoc($sql_get_project, 0) as $key => $value_lab) {
+                $url_lab = $_DOMAIN.'labs/info/'.$value_lab['idLab'];
+              }
+              echo '<span><a href="'.$url_lab.'">Các dự án đang tham gia: <span class="badge">'.$total_project.'</span></a></span>';
+            } else {
+              $total_project = 0;
+              echo '<span>Các dự án đang tham gia: <span class="badge">'.$total_project.'</span></span>';
             }
-            if ($value_lab['idLab'] != 0) {
-              echo '
-              <span><a href="'.$url_lab.'">Các dự án đang tham gia: <span class="badge">'.$total_project.'</span></a></span>';
-            } else echo '
-            <span>Các dự án đang tham gia: <span class="badge">'.$total_project.'</span></span>';
             ?>
         </div>
         <div class="col-sm-6 profile-info">
@@ -96,9 +99,9 @@ else {
                 if ($_GET['tab'] == $user) {
                   echo '<span><strong>Mật khẩu: </strong><a href="#" data-toggle="modal" data-target="#changePass">Thay đổi</a></span><br  />';
                 }
-              } else echo '<a href="#" data-toggle="modal" data-target="#changePass">Thay đổi</a></span><br  />';?>
-            <span><strong>Website: </strong><i><?php echo $data_user_profile['website']; ?></i></span><br  />
-            <span><strong>Mạng xã hội: </strong><i><?php echo $data_user_profile['social']; ?></i></span><br  />
+              } else echo '<span><strong>Mật khẩu: </strong><a href="#" data-toggle="modal" data-target="#changePass">Thay đổi</a></span><br  />';?>
+            <span><strong>Website: </strong><i><a href="<?php echo $data_user_profile['website']; ?>"><?php echo $data_user_profile['website']; ?></a></i></span><br  />
+            <span><strong>Mạng xã hội: </strong><i><a href="<?php echo $data_user_profile['social']; ?>"><?php echo $data_user_profile['social']; ?></a></i></span><br  />
             <span><strong>Địa chỉ: </strong><?php echo $data_user_profile['address']; ?></span>
         </div>
     </div>
@@ -119,7 +122,7 @@ else {
             <fieldset class="form-group">
               <label>Xem trước</label>
               <center>
-                <img id="avatar" class="profile-avatar" alt="your image" src="<?php echo $_DOMAIN.$data_user_profile['url']; ?>" data-holder-rendered="true">
+                <img id="avatar" class="profile-avatar" alt="your image" src="<?php echo $_DOMAIN.$data_user_profile['urlImg']; ?>" data-holder-rendered="true">
               </center>
             </fieldset>
             <fieldset class="form-group">
@@ -292,7 +295,25 @@ else {
             new Warning($_DOMAIN.'profile','File không được lớn hơn 5MB');
         } else {
             // Upload file
-            $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
+            // Tạo folder năm hiện tại
+            if (!is_dir($dir.$year_current))
+            {
+                mkdir($dir.$year_current.'/');
+            }
+
+            // Tạo folder tháng hiện tại
+            if (!is_dir($dir.$year_current.'/'.$month_current))
+            {
+                mkdir($dir.$year_current.'/'.$month_current.'/');
+            }
+
+            // Tạo folder ngày hiện tại
+            if (!is_dir($dir.$year_current.'/'.$month_current.'/'.$day_current))
+            {
+                mkdir($dir.$year_current.'/'.$month_current.'/'.$day_current.'/');
+            }
+
+            $path_img = $dir.$year_current.'/'.$month_current.'/'.$day_current.'/'.$name_img; // Đường dẫn thư mục chứa file
             move_uploaded_file($source_img, $path_img); // Upload file
             $array = (explode(".",$name_img));
             $type_img = $array[1];// Loại file
@@ -301,10 +322,7 @@ else {
             // Thêm dữ liệu vào table
             $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
             $db->query($sql_up_file);
-            $sql_get_img = "SELECT * FROM images ORDER BY idImg DESC";
-            $idImg = $db->num_rows($sql_get_img);
-            $idImg = $idImg + 1;
-            $sql_change_avatar = "UPDATE user_info SET idImg = '$idImg' WHERE idUser = '$id'";
+            $sql_change_avatar = "UPDATE user_info SET urlImg = '$url_img' WHERE idUser = '$id'";
             $db->query($sql_change_avatar);
             // echo '<div class="alert alert-success">File Uploaded</div>';
             new Success($_DOMAIN.'profile','Thay đổi avatar thành công');
@@ -317,12 +335,37 @@ if (isset($_GET['tab'])) {
   if ($_GET['tab'] == $user) {
     if (isset($_GET['act'])) {
       if ($_GET['act'] == 'delAvatar') {
-        $sql_del_avatar = "UPDATE user_info SET idImg = 1 WHERE idUser = '$id'";
-        $db->query($sql_del_avatar);
+        $url = $data_user_profile['urlImg'];
+        $sql_check_id_img_exist = "SELECT * FROM images WHERE url = '$url'";
+          if ($db->num_rows($sql_check_id_img_exist))
+          {
+              $data_img = $db->fetch_assoc($sql_check_id_img_exist, 1);
+              if (file_exists($data_img['url']))
+              {
+                  unlink($data_img['url']);
+              }
+
+              $sql_delete_img = "DELETE FROM images WHERE url = '$url'";
+              $db->query($sql_delete_img);
+              $sql_del_avatar = "UPDATE user_info SET urlImg = '$avatarDefault' WHERE idUser = '$id'";
+              $db->query($sql_del_avatar);
+          }
         new Success($_DOMAIN.'profile','Xóa avatar thành công');
       } else new Warning($_DOMAIN.'profile','Có lỗi xảy ra! Vui lòng kiểm tra lại');
     } else new Redirect($_DOMAIN.'profile');
   } else new Warning('','Bạn không có quyền thay đổi thông tin người dùng khác');
+}
+
+//Xử lý avatar bị xóa
+$sql_get_avatar = "SELECT urlImg FROM user_info WHERE idUser = '$id'";
+foreach ($db->fetch_assoc($sql_get_avatar,1) as $key => $img) {
+  if (!file_exists($img))
+    {
+      new Info('','Avatar đã bị xóa! Hệ thống tự động chuyển về avatar mặc định sau 2s.');
+      $sql_del_avatar = "UPDATE user_info SET urlImg = '$avatarDefault' WHERE idUser = '$id'";
+      $db->query($sql_del_avatar);
+      new Reload($_DOMAIN.'profile');
+    }
 }
 
 //Xử lý thông tin nghiên cứu
