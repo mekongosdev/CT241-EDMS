@@ -26,6 +26,86 @@ new Role($roleUser);
                 <strong>Lưu ý: </strong>Xóa tài khoản sẽ xóa cả thành viên có cùng ID
             ';
 
+            //Them tai khoan
+            if (isset($_POST['add_account'])){
+              $id_user = $_POST['id_user'];
+              $pwd = $_POST['pwd'];
+              $re_pwd = $_POST['re-pwd'];
+              $email = $_POST['email'];
+              $role = $_POST['role'];
+
+              if ($pwd != $re_pwd) {
+                new Warning($_DOMAIN.'admin/account','Mật khẩu không trùng khớp');
+              }
+              if ($role == 'Owner') {
+                new Warning($_DOMAIN.'admin/account','Chỉ có duy nhất một Chủ sở hữu - Owner');
+              }
+              if (!$id_user || !$pwd || !$email){
+                new Warning($_DOMAIN.'admin/account','Vui lòng nhập đầy đủ thông tin');
+              }
+              if ($id_user && $pwd == $re_pwd && $email && $role != 'Owner') {
+                $sql_add_new_account = "INSERT INTO user_auth(idUser,pwd,email,roleName,status,dateCreate) VALUES ('$id_user','$pwd','$email','$role',1,'$date_current')";//status=1 -> Account active
+                $db->query($sql_add_new_account);
+                new Success($_DOMAIN.'admin/members','Thêm tài khoản mới thành công');
+              } else new Warning($_DOMAIN.'admin/account','Có lỗi xảy ra. Vui lòng kiểm tra lại');
+            }
+            //Chức năng xử lý tài khoản
+            //Khóa nhiều user
+            if (isset($_POST['lockUsers'])) {
+              $id_acc_lock = $_POST['id_acc'];
+              foreach ($id_acc_lock as $key => $data) {
+                $sql_lock_users = "UPDATE user_auth SET status = 0 WHERE idUser = '$data'";
+                $db->query($sql_lock_users);
+              }
+              new Success($_DOMAIN.'admin/account','Khóa các tài khoản thành công');
+            }
+            //Khóa 1 user
+            if (isset($_POST['lockUser'])) {
+              $idLock = $_POST['toLockUser'];
+
+              $sql_lock_user = "UPDATE user_auth SET status = 0 WHERE idUser = '$idLock'";
+              $db->query($sql_lock_user);
+              new Success($_DOMAIN.'admin/account','Khóa tài khoản thành công');
+            }
+            //Mở khóa nhiều user
+            if (isset($_POST['unlockUsers'])) {
+              $id_acc_unlock = $_POST['id_acc'];
+              foreach ($id_acc_unlock as $key => $data) {
+                $sql_unlock_users = "UPDATE user_auth SET status = 1 WHERE idUser = '$data'";
+                $db->query($sql_unlock_users);
+              }
+              new Success($_DOMAIN.'admin/account','Mở khóa các tài khoản thành công');
+            }
+            //Mở khóa 1 user
+            if (isset($_POST['unlockUser'])) {
+              $idUnlock = $_POST['toUnlockUser'];
+
+              $sql_unlock_user = "UPDATE user_auth SET status = 1 WHERE idUser = '$idUnlock'";
+              $db->query($sql_unlock_user);
+              new Success($_DOMAIN.'admin/account','Mở khóa tài khoản thành công');
+            }
+            //Xóa nhiều user
+            if (isset($_POST['delUsers'])) {
+              $id_acc_del = $_POST['id_acc'];
+              foreach ($id_acc_del as $key => $data) {
+                $sql_del_users = "DELETE FROM user_auth WHERE idUser = '$data'";
+                $sql_del_members = "DELETE FROM user_info WHERE idUser = '$data'";
+                $db->query($sql_del_users);
+                $db->query($sql_del_members);
+              }
+              new Success($_DOMAIN.'admin/account','Xóa các tài khoản và thành viên cùng tên thành công');
+            }
+            //Xóa 1 user
+            if (isset($_POST['delUser'])) {
+              $idDel = $_POST['toDelUser'];
+
+              $sql_del_user = "DELETE FROM user_auth WHERE idUser = '$idDel'";
+              $sql_del_member = "DELETE FROM user_info WHERE idUser = '$idDel'";
+              $db->query($sql_del_user);
+              $db->query($sql_del_member);
+              new Success($_DOMAIN.'admin/account','Xóa tài khoản và thành viên cùng tên thành công');
+            }
+
 // Content danh sách tài khoản
 $sql_get_list_acc = "SELECT * FROM user_auth ORDER BY idUser ASC";
 // Nếu có tài khoản
@@ -232,86 +312,6 @@ echo '
   </div>
 </div>
 ';
-
-//Them tai khoan
-if (isset($_POST['add_account'])){
-  $id_user = $_POST['id_user'];
-  $pwd = $_POST['pwd'];
-  $re_pwd = $_POST['re-pwd'];
-  $email = $_POST['email'];
-  $role = $_POST['role'];
-
-  if ($pwd != $re_pwd) {
-    new Warning($_DOMAIN.'admin/account','Mật khẩu không trùng khớp');
-  }
-  if ($role == 'Owner') {
-    new Warning($_DOMAIN.'admin/account','Chỉ có duy nhất một Chủ sở hữu - Owner');
-  }
-  if (!$id_user || !$pwd || !$email){
-    new Warning($_DOMAIN.'admin/account','Vui lòng nhập đầy đủ thông tin');
-  }
-  if ($id_user && $pwd == $re_pwd && $email && $role != 'Owner') {
-    $sql_add_new_account = "INSERT INTO user_auth(idUser,pwd,email,roleName,status,dateCreate) VALUES ('$id_user','$pwd','$email','$role',1,'$date_current')";//status=1 -> Account active
-    $db->query($sql_add_new_account);
-    new Success($_DOMAIN.'admin/members','Thêm tài khoản mới thành công');
-  } else new Warning($_DOMAIN.'admin/account','Có lỗi xảy ra. Vui lòng kiểm tra lại');
-}
-//Chức năng xử lý tài khoản
-//Khóa nhiều user
-if (isset($_POST['lockUsers'])) {
-  $id_acc_lock = $_POST['id_acc'];
-  foreach ($id_acc_lock as $key => $data) {
-    $sql_lock_users = "UPDATE user_auth SET status = 0 WHERE idUser = '$data'";
-    $db->query($sql_lock_users);
-  }
-  new Success($_DOMAIN.'admin/account','Khóa các tài khoản thành công');
-}
-//Khóa 1 user
-if (isset($_POST['lockUser'])) {
-  $idLock = $_POST['toLockUser'];
-
-  $sql_lock_user = "UPDATE user_auth SET status = 0 WHERE idUser = '$idLock'";
-  $db->query($sql_lock_user);
-  new Success($_DOMAIN.'admin/account','Khóa tài khoản thành công');
-}
-//Mở khóa nhiều user
-if (isset($_POST['unlockUsers'])) {
-  $id_acc_unlock = $_POST['id_acc'];
-  foreach ($id_acc_unlock as $key => $data) {
-    $sql_unlock_users = "UPDATE user_auth SET status = 1 WHERE idUser = '$data'";
-    $db->query($sql_unlock_users);
-  }
-  new Success($_DOMAIN.'admin/account','Mở khóa các tài khoản thành công');
-}
-//Mở khóa 1 user
-if (isset($_POST['unlockUser'])) {
-  $idUnlock = $_POST['toUnlockUser'];
-
-  $sql_unlock_user = "UPDATE user_auth SET status = 1 WHERE idUser = '$idUnlock'";
-  $db->query($sql_unlock_user);
-  new Success($_DOMAIN.'admin/account','Mở khóa tài khoản thành công');
-}
-//Xóa nhiều user
-if (isset($_POST['delUsers'])) {
-  $id_acc_del = $_POST['id_acc'];
-  foreach ($id_acc_del as $key => $data) {
-    $sql_del_users = "DELETE FROM user_auth WHERE idUser = '$data'";
-    $sql_del_members = "DELETE FROM user_info WHERE idUser = '$data'";
-    $db->query($sql_del_users);
-    $db->query($sql_del_members);
-  }
-  new Success($_DOMAIN.'admin/account','Xóa các tài khoản và thành viên cùng tên thành công');
-}
-//Xóa 1 user
-if (isset($_POST['delUser'])) {
-  $idDel = $_POST['toDelUser'];
-
-  $sql_del_user = "DELETE FROM user_auth WHERE idUser = '$idDel'";
-  $sql_del_member = "DELETE FROM user_info WHERE idUser = '$idDel'";
-  $db->query($sql_del_user);
-  $db->query($sql_del_member);
-  new Success($_DOMAIN.'admin/account','Xóa tài khoản và thành viên cùng tên thành công');
-}
 ?>
 
 <!-- JS Function -->

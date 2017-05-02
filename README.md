@@ -1,4 +1,6 @@
 # ptycpm_htql_thietbinhung
+Page GitHub: https://ngthuc.github.io/ptycpm_htql_thietbinhung/
+URL demo: https://demo.ngthuc.com/project/ptycpm/
 This website uses the following technologies and platforms:
 * Front-end: 
 - HTML/CSS

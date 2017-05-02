@@ -19,7 +19,7 @@ RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/$ index.php?acti
 RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)$ index.php?action=$1&tab=$2&act=$3&id=$4
 RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/$ index.php?action=$1&tab=$2&act=$3&id=$4
 
-#Comment code: Phân trang bài viết hiện không thể sử dụng, đang sử dụng phân trang theo tham số
+#Comment code: Phân trang bài viết hiện không thể sử dụng, đang sử dụng phân trang theo tham số của trang
 # Url phân trang bài viết 1 tham số
 #RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)$ index.php?action=$1&page=$2
 #RewriteRule ^([a-zA-Z0-9_-]+)&page=([a-zA-Z0-9_-]+)$ index.php?action=$1&page=$2

@@ -1,4 +1,4 @@
-<a href="<?php echo $_DOMAIN; ?>admin/device" class="buttonFixed adminCP"></a>
+<a href="<?php echo $_DOMAIN; ?>admin/deviceCP" class="buttonFixed adminCP"></a>
 
 <?php
 // Nếu chưa đăng nhập
@@ -30,7 +30,7 @@ new Role($roleUser);
       $totalNow = $totalDevice - $total;
       //Ghi nhan qua trinh muon
       $qry_borrow = "INSERT INTO borrow_device(idDevice,idProject,totalBorrow) VALUES ('$idDevice','$idProject','$total')";
-      $qry_borrow_detail = "INSERT INTO borrow_device_detail(idBorrowDevice,idUser,statusBorrow) VALUES ('$idNewest','$user_borrow',0)";//status = 0 -> waiting accept
+      $qry_borrow_detail = "INSERT INTO borrow_device_detail(idBorrowDevice,idUser,statusBorrow,dateBorrow) VALUES ('$idNewest','$user_borrow',3,'$date_current')";//status = 0 -> waiting accept
       if ($totalDevice > 0) {
           if ($total <= $totalDevice) {
               $db->query($qry_borrow);
