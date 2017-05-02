@@ -199,7 +199,16 @@ foreach ($db->fetch_assoc($sql_borrow_out_of_date,0) as $key => $date) {
           $sql_get_borrow = "SELECT * FROM borrow_device_detail ORDER BY idBorrowDeviceDetail DESC";
           if ($db->num_rows($sql_get_borrow)) {
               $row="SELECT idBorrowDeviceDetail FROM borrow_device_detail";
-              $row_per_page=10;
+              // $row_val_out_date = $db->num_rows($val_out_date);
+              // $row_wating = $db->num_rows($val_wating);
+              // $row_borrow = $db->num_rows($val_borrow);
+              // $row_return = $db->num_rows($val_return);
+              // $row_cancel = $db->num_rows($val_cancel);
+              // $total_rows = $row_val_out_date + $row_wating + $row_borrow + $row_return + $row_cancel;
+              $row_per_page=50;
+              // if ($total_rows > $row_per_page) {
+              //   $row_per_page =
+              // }
               $rows=$db->num_rows($row);
               if ($rows>$row_per_page) $page=ceil($rows/$row_per_page);
               else $page=1;
@@ -207,9 +216,14 @@ foreach ($db->fetch_assoc($sql_borrow_out_of_date,0) as $key => $date) {
                    $start=($_GET['act']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
               else $start=0;
 
-              //Hiển thị đã quá hạn
+              //SQL get page
               $val_out_date = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice) AND a.statusBorrow = 4 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+              $val_wating = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 0 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+              $val_borrow = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 1 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+              $val_return = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 3 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
+              $val_cancel = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 2 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
 
+              //Hiển thị đã quá hạn
               if ($db->num_rows($val_out_date)){
                 foreach ($db->fetch_assoc($val_out_date, 0) as $key => $row) {
                   $get_status = $row['statusBorrow'];
@@ -256,8 +270,6 @@ foreach ($db->fetch_assoc($sql_borrow_out_of_date,0) as $key => $date) {
               }
 
               //Hiển thị đang chờ duyệt
-              $val_wating = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 0 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
-
               if ($db->num_rows($val_wating)) {
                 foreach ($db->fetch_assoc($val_wating, 0) as $key => $row) {
                   $get_status = $row['statusBorrow'];
@@ -304,8 +316,6 @@ foreach ($db->fetch_assoc($sql_borrow_out_of_date,0) as $key => $date) {
               }
 
               //Hiển thị đang mượn
-              $val_borrow = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 1 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
-
               if ($db->num_rows($val_borrow)) {
                 foreach ($db->fetch_assoc($val_borrow, 0) as $key => $row) {
                   $get_status = $row['statusBorrow'];
@@ -352,8 +362,6 @@ foreach ($db->fetch_assoc($sql_borrow_out_of_date,0) as $key => $date) {
               }
 
               //Hiển thị đã trả
-              $val_return = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 3 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
-
               if ($db->num_rows($val_return)) {
                 foreach ($db->fetch_assoc($val_return, 0) as $key => $row) {
                   $get_status = $row['statusBorrow'];
@@ -400,8 +408,6 @@ foreach ($db->fetch_assoc($sql_borrow_out_of_date,0) as $key => $date) {
               }
 
               //Hiển thị bị từ chối
-              $val_cancel = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDevice = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice)  AND a.statusBorrow = 2 ORDER BY idBorrowDeviceDetail DESC limit $start,$row_per_page";
-
               if ($db->num_rows($val_cancel)) {
                 foreach ($db->fetch_assoc($val_cancel, 0) as $key => $row) {
                   $get_status = $row['statusBorrow'];
@@ -460,7 +466,7 @@ $rows=$db->num_rows($row);
 $config = array(
     'current_page'  => isset($_GET['act']) ? $_GET['act'] : 1, // Trang hiện tại
     'total_record'  => $rows, // Tổng số record
-    'limit'         => 10,// limit
+    'limit'         => 50,// limit
     'link_full'     => $_DOMAIN.'admin/borrowDeviceCP/{page}',// Link full có dạng như sau: domain/com/page/{page}
     'link_first'    => $_DOMAIN.'admin/borrowDeviceCP',// Link trang đầu tiên
     'range'         => 3 // Số button trang bạn muốn hiển thị
