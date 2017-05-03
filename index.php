@@ -1,4 +1,6 @@
 <?php
+//Chèn chữ ký
+require_once 'control/signature.php';
 
 // Require database & thông tin chung
 require_once 'control/init.php';

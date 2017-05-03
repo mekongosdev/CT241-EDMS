@@ -4,7 +4,7 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 new Role($roleUser);
 
 if (requestRole($roleUser,'labsCP') == 1) {
-  echo '<a href="'.$_DOMAIN.'admin/labsCP" class="buttonFixed adminCP"></a>'; 
+  echo '<a href="'.$_DOMAIN.'admin/labsCP" class="buttonFixed adminCP"></a>';
 }
 
 if (isset($_GET["tab"])) {
@@ -28,13 +28,14 @@ if (isset($_GET["tab"])) {
                 <span>Địa chỉ: '.$data_lab_info['address'].'</span><br />
                 <span>Google Maps: <a href="'.$data_lab_info['location'].'">'.$data_lab_info['location'].'</a></span>
                 <div class="divider"></div>';
-                $sql_get_project = "SELECT * FROM project_info WHERE idLab = '$id'";
+                $sql_get_project = "SELECT * FROM project_info INNER JOIN user_info ON project_info.nameUser = user_info.fullName WHERE idLab = '$id'";
                 $total_project = $db->num_rows($sql_get_project);
                 echo '
                 <span>Các dự án: <span class="badge">'.$total_project.'</span></span><br  />';
                 if ($total_project > 0) {
                   foreach ($db->fetch_assoc($sql_get_project, 0) as $key => $value_lab) {
-                    echo '- '.$value_lab['nameProject'].' - '.$value_lab['nameUser'].'<br  />';
+                    // echo '- '.$value_lab['nameProject'].' - '.$value_lab['nameUser'].'<br  />';
+                    echo '- <a href="'.$_DOMAIN.'project/info/'.$value_lab['idProject'].'">'.$value_lab['nameProject'].'</a> - <a href="'.$_DOMAIN.'profile/'.$value_lab['idUser'].'">'.$value_lab['nameUser'].'</a><br />';
                   }
                 } else echo '<br><div class="alert alert-info">Chưa có dự án nào.</div>';
                 // <a href="'.$_DOMAIN.'#">- '.$data_lab_info['nameProject'].' - '.$data_lab_info['nameUser'].'</a><br  />

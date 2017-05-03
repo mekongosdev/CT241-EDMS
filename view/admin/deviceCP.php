@@ -7,7 +7,7 @@ new Role($roleUser);?>
 
 <h3>Quản lý thiết bị</h3>
 <form action="<?php echo $_DOMAIN; ?>admin/deviceCP" method="POST">
-  <?php if (requestRole($roleUser,'addDevice') == 1) {echo '<a class="btn btn-success" data-toggle="modal" data-target="#addDevice">Thêm thiết bị mới</a>';} ?>
+  <?php if (requestRole($roleUser,'addDevice') == 1) {echo '<a class="btn btn-success" data-toggle="modal" data-target="#addDevice"><span class="glyphicon glyphicon-plus"></span> Thêm thiết bị mới</a>';} ?>
 
   <?php if (requestRole($roleUser,'removeDevice') == 1) {echo '<button class="btn btn-danger" name="trashDeviceBtn" type="submit"><span class="glyphicon glyphicon-trash"></span> Xóa thiết bị</button>';} ?>
   <a href="<?php echo $_DOMAIN; ?>admin/deviceCP" class="btn btn-default">
@@ -24,13 +24,14 @@ new Role($roleUser);?>
       $currencyDevice = $_POST['currencyDevice'];
       $totalDevice = $_POST['totalDevice'];
       $descriptionDevice = $_POST['descriptionDevice'];
+      $pricingDevice = $_POST['pricingDevice'];
       $producerDevice = $_POST['partnerDevice'];
 
-      if($nameDevice && $dateDevice && $statusDevice && $totalDevice && $producerDevice && $currencyDevice && $descriptionDevice)
+      if($nameDevice && $dateDevice && $statusDevice && $totalDevice && $producerDevice && $pricingDevice && $currencyDevice && $descriptionDevice)
          {
            // Xử Lý Upload
            if (isset($_FILES['icon_up'])) {
-               $dir_img = 'view/images/';
+               $dir = 'view/images/';
                $name_img = stripslashes($_FILES['icon_up']['name']);
                $source_img = $_FILES['icon_up']['tmp_name'];
                $size_img = $_FILES['icon_up']['size']; // Dung lượng file
@@ -68,7 +69,7 @@ new Role($roleUser);?>
                      $db->query($sql_up_file);
                      }
                  }
-            $sql_add_new_device = "INSERT INTO device_info(idProducer,urlImg,nameDevice,status,currency,pricing,total,dateImport,description) VALUES ('$producerDevice','$url_img','$nameDevice','$statusDevice','$currencyDevice',0,'$totalDevice','$dateDevice','$descriptionDevice')";
+            $sql_add_new_device = "INSERT INTO device_info(idProducer,urlImg,nameDevice,status,currency,pricing,total,dateImport,description) VALUES ('$producerDevice','$url_img','$nameDevice','$statusDevice','$currencyDevice','$pricingDevice','$totalDevice','$dateDevice','$descriptionDevice')";
             $query = $db->query($sql_add_new_device);
            new Success($_DOMAIN.'admin/deviceCP','Thêm thiết bị mới thành công');
         } else new Warning($_DOMAIN.'admin/deviceCP','Vui lòng điền đầy đủ thông tin');
@@ -78,7 +79,6 @@ new Role($roleUser);?>
       if (isset($_POST['edit_device'])) {
         $idDevice = $_POST['toThisDevice'];
         $nameDevice = addslashes($_POST['toName']);
-        $dateDevice = $_POST['toDate'];
         $statusDevice = $_POST['statusDevice'];
         $totalDevice = $_POST['toTotal'];
         $pricing = $_POST['toPricing'];
@@ -86,49 +86,9 @@ new Role($roleUser);?>
         $producerDevice = $_POST['producerDevice'];
 
         if ($nameDevice && $totalDevice && $pricing && $descriptionDevice) {
-          // Xử Lý Upload
-          if (isset($_FILES['icon_up'])) {
-              $dir_img = 'view/images/';
-              $name_img = stripslashes($_FILES['icon_up']['name']);
-              $source_img = $_FILES['icon_up']['tmp_name'];
-              $size_img = $_FILES['icon_up']['size']; // Dung lượng file
-
-                if ($size_img > 10485760){
-                    new Warning('','File không được lớn hơn 10MB');
-                } else {
-                    // Upload file
-                    // Tạo folder năm hiện tại
-                    if (!is_dir($dir.$year_current))
-                    {
-                        mkdir($dir.$year_current.'/');
-                    }
-
-                    // Tạo folder tháng hiện tại
-                    if (!is_dir($dir.$year_current.'/'.$month_current))
-                    {
-                        mkdir($dir.$year_current.'/'.$month_current.'/');
-                    }
-
-                    // Tạo folder ngày hiện tại
-                    if (!is_dir($dir.$year_current.'/'.$month_current.'/'.$day_current))
-                    {
-                        mkdir($dir.$year_current.'/'.$month_current.'/'.$day_current.'/');
-                    }
-
-                    $path_img = $dir.$year_current.'/'.$month_current.'/'.$day_current.'/'.$name_img; // Đường dẫn thư mục chứa file
-                    move_uploaded_file($source_img, $path_img); // Upload file
-                    $array = (explode(".",$name_img));
-                    $type_img = $array[1];// Loại file
-                    $url_img = $path_img; // Đường dẫn file
-
-                    // Thêm ảnh vào table images
-                    $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
-                    $db->query($sql_up_file);
-                    }
-                }
-            $sql_edit_device = "UPDATE device_info SET idProducer = '$producerDevice',urlImg = '$url_img',nameDevice = '$nameDevice',status = '$statusDevice',pricing = '$pricing',dateImport = '$dateDevice',total = '$totalDevice',description = '$descriptionDevice' WHERE idDevice = '$idDevice'";
+            $sql_edit_device = "UPDATE device_info SET idProducer = '$producerDevice',nameDevice = '$nameDevice',status = '$statusDevice',pricing = '$pricing',total = '$totalDevice',description = '$descriptionDevice' WHERE idDevice = '$idDevice'";
             $db->query($sql_edit_device);
-            new Success($_DOMAIN.'admin/deviceCP/');
+            // new Success($_DOMAIN.'admin/deviceCP/');
         } else new Warning($_DOMAIN.'admin/deviceCP','Vui lòng điền đầy đủ thông tin');
       }
 
@@ -140,24 +100,29 @@ new Role($roleUser);?>
         if ($trash) {
           foreach ($trash as $key => $data) {
             $sql_get_borrow = "SELECT * FROM borrow_device a, borrow_device_detail b, device_info c WHERE (a.idDevice = c.idDevice ) AND (a.idBorrowDevice = b.idBorrowDeviceDetail) AND c.idDevice = '$data'";
-            foreach ($db->fetch_assoc($sql_get_borrow,0) as $key => $get_borrow) {
-              array_push($stt,$get_borrow['statusBorrow']);
+            if ($db->num_rows($sql_get_borrow)) {
+              foreach ($db->fetch_assoc($sql_get_borrow,0) as $key => $get_borrow) {
+                array_push($stt,$get_borrow['statusBorrow']);
+              }
             }
+
             $sql_get_total_device = "SELECT total FROM device_info WHERE idDevice = '$data'";
-            foreach ($db->fetch_assoc($sql_get_borrow,1) as $key => $get_total) {
-              $totalDevice = $get_total;
+            if ($db->num_rows($sql_get_total_device)) {
+              foreach ($db->fetch_assoc($sql_get_borrow,0) as $key => $get_total) {
+                $totalDevice = $get_total['total'];
+              }
             }
+
+
             if (in_array(5,$stt) || in_array(4,$stt) || in_array(2,$stt)) {
-              echo 'OK';
-              // $sql_upd_device = "UPDATE device_info SET total = 0 WHERE idDevice = '$data'";
-              // $db->query($sql_upd_device);
+                $sql_upd_device = "UPDATE device_info SET total = 0 WHERE idDevice = '$data'";
+                $db->query($sql_upd_device);
             } else {
-              echo 'Cancel';
-              // $sql_del_device = "UPDATE device_info SET displayDevice = 0 WHERE idDevice = '$data'";
-              // $db->query($sql_del_device);
+                $sql_del_device = "UPDATE device_info SET displayDevice = 0 WHERE idDevice = '$data'";
+                $db->query($sql_del_device);
             }
           }
-          // new Success($_DOMAIN.'admin/deviceCP');
+          new Success($_DOMAIN.'admin/deviceCP');
         }
       }
 
@@ -229,7 +194,7 @@ new Role($roleUser);?>
                 echo '<tr>
                     <td><input type="checkbox" name="idDevice[]" value="' . $row['idDevice'] .'"></td>
                     <td>'.$row['idDevice'].'</td>
-                    <td><img src="'.$_DOMAIN.$row['urlImg'].'" style="width:100px;height:100px;"/></td>
+                    <td><img src="'.$_DOMAIN.$row['urlImg'].'" style="width:100px;height:100px;" alt="'.$row['nameDevice'].'"/></td>
                     <td>'.$row['nameDevice'].'</td>
                     <td>'.$row['description'].'</td>
                     <td>'.$row['date'].'</td>
@@ -303,6 +268,9 @@ echo $paging->html();
                         <fieldset class="form-group">
                             <label for="totalDevice">Số lượng</label>
                             <input type="number" class="form-control" name="totalDevice" id="totalDevice" placeholder="Nhập số lượng">
+                        </fieldset><fieldset class="form-group">
+                            <label for="pricingDevice">Đơn giá</label>
+                            <input type="number" class="form-control" name="pricingDevice" id="pricingDevice" placeholder="Nhập đơn giá (đơn vị đồng)">
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="currencyDevice">Đơn vị tính</label>
@@ -348,15 +316,11 @@ echo $paging->html();
                     <h4 class="modal-title">Chỉnh sửa thiết bị</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo $_DOMAIN; ?>admin/deviceCP" method="post" enctype="multipart/form-data">
+                    <form action="<?php echo $_DOMAIN; ?>admin/deviceCP" method="post">
                       <input type="hidden" name="toThisDevice" id="toThisDevice" value=""/>
                         <fieldset class="form-group">
                             <label for="nameDevice">Tên thiết bị</label>
                             <input type="text" class="form-control" name="toName" id="toName" value="" placeholder="Nhập tên thiết bị">
-                        </fieldset>
-                        <fieldset class="form-group">
-                            <label for="dateDevice">Ngày nhập</label>
-                            <input type="date" class="form-control" name="toDate" placeholder="Chọn ngày nhập">
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="statusDevice">Tình trạng nhập vào</label>
@@ -396,10 +360,6 @@ echo $paging->html();
                               ?>
                             </select>
                             <small class="text-muted">Nếu không rõ nhà sản xuất thì chọn Other</i></small>
-                        </fieldset>
-                        <fieldset class="form-group">
-                            <label for="pictureDevice">Hình ảnh</label>
-                            <input type="file" class="form-control" name="icon_up" id="pictureDevice" accept="image/*">
                         </fieldset>
                 </div>
                 <div class="modal-footer">

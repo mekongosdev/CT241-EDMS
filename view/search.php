@@ -31,7 +31,7 @@ new Role($roleUser);
 
           //Cac cau lenh tim kiem
           $search_device = "SELECT * FROM device_info WHERE nameDevice LIKE '%$value%'";
-          $search_member = "SELECT * FROM user_info INNER JOIN images ON user_info.idImg = images.idImg WHERE fullName LIKE '%$value%' OR phone LIKE '%$value%' OR email LIKE '%$value%' OR idUser LIKE '%$value%'";
+          $search_member = "SELECT * FROM user_info  WHERE fullName LIKE '%$value%' OR phone LIKE '%$value%' OR email LIKE '%$value%' OR idUser LIKE '%$value%'";
           $search_project = "SELECT *,DATE_FORMAT( dateStart,  '%d/%m/%Y' ) AS date FROM project_info WHERE nameProject LIKE '%$value%'";
           $search_lab = "SELECT * FROM lab_info WHERE nameLab LIKE '%$value%' OR unit LIKE '%$value%' OR phone LIKE '%$value%' OR address LIKE '%$value%'";
 
@@ -54,7 +54,7 @@ new Role($roleUser);
                   echo '
                   <tr>
                       <td><img src="'.$_DOMAIN.$device_result['urlImg'].'" style="width:100px;height:100px;"/></td>
-                      <td>'.$device_result['nameDevice'].'</td>
+                      <td><a href="'.$_DOMAIN.'device/info/'.$device_result['idDevice'].'">'.$device_result['nameDevice'].'</a></td>
                       <td>'.$device_result['description'].'</td>
                   </tr>';
               }
@@ -78,7 +78,7 @@ new Role($roleUser);
                 foreach ($db->fetch_assoc($search_member,0) as $key => $member_result) {
                   echo '
                   <tr>
-                      <td><img src="'.$_DOMAIN.$member_result['url'].'" style="width:100px;height:100px;"/></td>
+                      <td><img src="'.$_DOMAIN.$member_result['urlImg'].'" style="width:100px;height:100px;"/></td>
                       <td><a href="'.$_DOMAIN.'profile/'.$member_result['idUser'].'">'.$member_result['fullName'].'</a></td>
                       <td><a href="tel:'.$member_result['phone'].'">'.$member_result['phone'].'</a></td>
                       <td><a href="mailto:'.$member_result['email'].'">'.$member_result['email'].'</a></td>
@@ -104,7 +104,7 @@ new Role($roleUser);
                   foreach ($db->fetch_assoc($search_project,0) as $key => $project_result) {
                     echo '
                       <tr>
-                          <td>'.$project_result['nameProject'].'</td>
+                          <td><a href="'.$_DOMAIN.'project/info/'.$project_result['idProject'].'">'.$project_result['nameProject'].'</a></td>
                           <td>'.$project_result['nameUser'].'</td>
                           <td>'.$project_result['nameStaff'].'</td>
                           <td>'.$project_result['date'].'</td>
@@ -186,7 +186,7 @@ new Role($roleUser);
                   foreach ($db->fetch_assoc($search_member,0) as $key => $member_result) {
                     echo '
                     <tr>
-                        <td><img src="'.$_DOMAIN.$member_result['url'].'" style="width:100px;height:100px;"/></td>
+                        <td><img src="'.$_DOMAIN.$member_result['urlImg'].'" style="width:100px;height:100px;"/></td>
                         <td><a href="'.$_DOMAIN.'profile/'.$member_result['idUser'].'">'.$member_result['fullName'].'</a></td>
                         <td><a href="tel:'.$member_result['phone'].'">'.$member_result['phone'].'</a></td>
                         <td><a href="mailto:'.$member_result['email'].'">'.$member_result['email'].'</a></td>

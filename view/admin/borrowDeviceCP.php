@@ -58,11 +58,17 @@ if (isset($_POST['requestOK'])) {
   }
   $totalNow = $totalDevice - $totalBorrow;
   $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
-  if ($request) {
+  if ($totalDevice > 0) {
+    if ($request) {
+      $db->query($sql_request);
+      $db->query($qry_totalDevice_now);
+    }
+    new Success($_DOMAIN.'admin/borrowDeviceCP');
+  } else {
+    $sql_request = "UPDATE borrow_device_detail SET statusBorrow = 0, dateBorrow = '$date_current', dateReturn = '$date_current' WHERE idBorrowDeviceDetail = '$request'";//status = 0 -> Cancel
     $db->query($sql_request);
-    $db->query($qry_totalDevice_now);
+    new Danger('','Không còn thiết bị này nữa, đồng ý thất bại!');
   }
-  new Success($_DOMAIN.'admin/borrowDeviceCP');
 }
 if (isset($_POST['requestOKBtn'])) {
   $request = $_POST['idBorrow'];
@@ -84,12 +90,18 @@ if (isset($_POST['requestOKBtn'])) {
     }
     $totalNow = $totalDevice - $totalBorrow;
     $qry_totalDevice_now = "UPDATE device_info SET total = '$totalNow' WHERE idDevice = '$idDevice'";//Cap nhat so luong thiet bi
-    if ($request) {
+    if ($totalDevice > 0) {
+      if ($request) {
+        $db->query($sql_request);
+        $db->query($qry_totalDevice_now);
+      }
+      new Success($_DOMAIN.'admin/borrowDeviceCP');
+    } else {
+      $sql_request = "UPDATE borrow_device_detail SET statusBorrow = 0, dateBorrow = '$date_current', dateReturn = '$date_current' WHERE idBorrowDeviceDetail = '$data'";//status = 0 -> Cancel
       $db->query($sql_request);
-      $db->query($qry_totalDevice_now);
+      new Danger('','Không còn thiết bị này nữa, đồng ý thất bại!');
     }
   }
-  new Success($_DOMAIN.'admin/borrowDeviceCP');
 }
 
 //Từ chối
@@ -253,7 +265,7 @@ if (isset($_POST['trashOKBtn'])) {
               else $start=0;
 
               //SQL get page
-              $val_page = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDeviceDetail = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice) ORDER BY statusBorrow DESC limit $start,$row_per_page";
+              $val_page = "SELECT * FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDeviceDetail = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice) ORDER BY statusBorrow DESC limit $start,$row_per_page";
 
               //Hiển thị danh sách quản lý mượn thiết bị
                 foreach ($db->fetch_assoc($val_page, 0) as $key => $row) {
@@ -276,7 +288,6 @@ if (isset($_POST['trashOKBtn'])) {
                       <td>'.$row['dateBorrow'].'</td>
                       <td>'.$row['dateReturn'].'</td>
                       <td>
-                          <button type="button" id="thisrequestDevice" class="btn btn-primary" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#requestDevice"><span class="glyphicon glyphicon-ok"></span></button>
                           <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
                       </td>';
                     } else if ($get_status == 3) { echo '

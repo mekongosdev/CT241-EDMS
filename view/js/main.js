@@ -77,7 +77,7 @@ $(document).ready(function () {
         });
     });
 */
-// 
+//
 // $(document).ready(function () {
 //         $('editDevice2').click(function () {
 //

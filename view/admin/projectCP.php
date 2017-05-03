@@ -140,7 +140,7 @@ new Role($roleUser);?>
                 </tr>';
               }
           } else {
-              echo '<br><br><div class="alert alert-info">Chưa có dự án nào.</div>';
+              echo '<br><div class="alert alert-info">Chưa có dự án nào.</div>';
           }
           ?>
         </tbody>

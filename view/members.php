@@ -41,12 +41,13 @@ if (requestRole($roleUser,'membersCP') == 1) {
                     </div>
                   </div>';
                 }
+                echo '</center>
+              </div>';
             } else {
-                echo '<br><br><div class="alert alert-info">Chưa có thành viên nào.</div>';
+                echo '<br><div class="alert alert-info">Chưa có thành viên nào.</div></center></div>';
             }
             ?>
-          </center>
-        </div>
+
 
       <div class="container">
         <?php

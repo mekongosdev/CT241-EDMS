@@ -29,8 +29,8 @@ foreach ($db->fetch_assoc($sql_get_setting, 0) as $key=>$data){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
    <!-- Bootstrap core JS -->
-   <script src="<?php echo $_DOMAIN; ?>view/js/main.js"></script>
-   <script src="<?php echo $_DOMAIN; ?>view/js/form.js"></script>
+   <!-- <script src="<?php //echo $_DOMAIN; ?>view/js/main.js"></script>
+   <script src="<?php //echo $_DOMAIN; ?>view/js/form.js"></script> -->
 
    <!-- ImportCSS -->
    <link href="<?php echo $_DOMAIN; ?>view/css/style.css" rel="stylesheet">
