@@ -17,6 +17,57 @@ new Role($roleUser);?>
             </button>
 
 <?php
+// Xử Lý Upload
+  if (isset($_FILES['img_up'])) {
+    foreach($_FILES['img_up']['name'] as $name => $value)
+      {
+        $dir = 'view/images/';
+        $name_img = stripslashes($_FILES['img_up']['name'][$name]);
+        $source_img = $_FILES['img_up']['tmp_name'][$name];
+        $size_img = $_FILES['img_up']['size'][$name]; // Dung lượng file
+
+        if ($size_img > 10485760){
+            new Warning('','File không được lớn hơn 10MB');
+        } else {
+            // Upload file
+            // $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
+            // move_uploaded_file($source_img, $path_img); // Upload file
+            // $new_name_img = rename($path_img, $dir.$hour_current.$minute_current.$second_current.'_'.$day_current.$month_current.$year_current.'.'.$type_img);
+            // $url_img = $new_name_img; // Đường dẫn file
+
+            // Tạo folder năm hiện tại
+            if (!is_dir($dir.$year_current))
+            {
+                mkdir($dir.$year_current.'/');
+            }
+
+            // Tạo folder tháng hiện tại
+            if (!is_dir($dir.$year_current.'/'.$month_current))
+            {
+                mkdir($dir.$year_current.'/'.$month_current.'/');
+            }
+
+            // Tạo folder ngày hiện tại
+            if (!is_dir($dir.$year_current.'/'.$month_current.'/'.$day_current))
+            {
+                mkdir($dir.$year_current.'/'.$month_current.'/'.$day_current.'/');
+            }
+
+            $path_img = $dir.$year_current.'/'.$month_current.'/'.$day_current.'/'.$name_img; // Đường dẫn thư mục chứa file
+            move_uploaded_file($source_img, $path_img); // Upload file
+            $array = (explode(".",$name_img));
+            $type_img = $array[1];// Loại file
+            $url_img = $path_img; // Đường dẫn file
+
+            // Thêm dữ liệu vào table
+            $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
+            $db->query($sql_up_file);
+            new Success($_DOMAIN.'admin/imagesCP','Upload ảnh thành công');
+            }
+          }
+        }
+
+
        //Xóa nhiều ảnh
         if (isset($_POST['delImages'])) {
         $id_img_del = $_POST['idImg'];
@@ -174,57 +225,6 @@ echo '<!-- Content chức năng tài khoản -->
     </div>
   </div>
 </div>';
-
-// Xử Lý Upload
-  if (isset($_FILES['img_up'])) {
-    foreach($_FILES['img_up']['name'] as $name => $value)
-      {
-        $dir = 'view/images/';
-        $name_img = stripslashes($_FILES['img_up']['name'][$name]);
-        $source_img = $_FILES['img_up']['tmp_name'][$name];
-        $size_img = $_FILES['img_up']['size'][$name]; // Dung lượng file
-
-        if ($size_img > 10485760){
-            new Warning('','File không được lớn hơn 10MB');
-        } else {
-            // Upload file
-            // $path_img = $dir.$name_img; // Đường dẫn thư mục chứa file
-            // move_uploaded_file($source_img, $path_img); // Upload file
-            // $new_name_img = rename($path_img, $dir.$hour_current.$minute_current.$second_current.'_'.$day_current.$month_current.$year_current.'.'.$type_img);
-            // $url_img = $new_name_img; // Đường dẫn file
-
-            // Tạo folder năm hiện tại
-            if (!is_dir($dir.$year_current))
-            {
-                mkdir($dir.$year_current.'/');
-            }
-
-            // Tạo folder tháng hiện tại
-            if (!is_dir($dir.$year_current.'/'.$month_current))
-            {
-                mkdir($dir.$year_current.'/'.$month_current.'/');
-            }
-
-            // Tạo folder ngày hiện tại
-            if (!is_dir($dir.$year_current.'/'.$month_current.'/'.$day_current))
-            {
-                mkdir($dir.$year_current.'/'.$month_current.'/'.$day_current.'/');
-            }
-
-            $path_img = $dir.$year_current.'/'.$month_current.'/'.$day_current.'/'.$name_img; // Đường dẫn thư mục chứa file
-            move_uploaded_file($source_img, $path_img); // Upload file
-            $array = (explode(".",$name_img));
-            $type_img = $array[1];// Loại file
-            $url_img = $path_img; // Đường dẫn file
-
-            // Thêm dữ liệu vào table
-            $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
-            $db->query($sql_up_file);
-            new Success($_DOMAIN.'admin/imagesCP','Upload ảnh thành công');
-            }
-          }
-        }
-
 ?>
 
 <!-- JS Function -->

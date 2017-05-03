@@ -7,15 +7,107 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 new Role($roleUser);?>
 
 <h3>Quản lý dự án</h3>
-  <button class="btn btn-success" data-toggle="modal" data-target="#addProject">Thêm dự án mới</button>
-  <a href="<?php echo $_DOMAIN; ?>admin/projectCP" class="btn btn-default">
-      <span class="glyphicon glyphicon-repeat"></span> Tải lại
-  </a>
+<form action="<?php echo $_DOMAIN; ?>admin/projectCP" method="POST" class="form-inline">
+  <div class="form-group">
+    <a class="btn btn-success" data-toggle="modal" data-target="#addProject">
+      <span class="glyphicon glyphicon-plus"></span> Thêm dự án mới
+    </a>
+    <button class="btn btn-danger" name="delPrj" type="submit">
+        <span class="glyphicon glyphicon-trash"></span> Xoá dự án
+    </button>
+    <a href="<?php echo $_DOMAIN; ?>admin/projectCP" class="btn btn-default">
+        <span class="glyphicon glyphicon-repeat"></span> Tải lại
+    </a>
+  </div>
 
+  <div class="form-group">
+    <label for="lab"> | Chọn Lab:</label>
+    <select class="form-control" name="addLab" id="lab">
+      <option value="Tự nghiên cứu">Không có Lab</option>
+      <?php
+          //Chọn người hướng dẫn
+          $sql_producer = "SELECT idLab,nameLab FROM lab_info";
+          foreach ($db->fetch_assoc($sql_producer,0) as $key => $data) {
+            echo '<option value="'.$data['idLab'].'">'.$data['nameLab'].'</option>';
+          }
+      ?>
+    </select>
+  </div>
+  <div class="form-group">
+    <button class="btn btn-primary form-inline" name="addToLab" type="submit">
+        <span class="glyphicon glyphicon-plus"></span> Thêm vào Lab
+    </button>
+  </div>
+
+<?php
+  //Thêm dự án
+    if(isset($_POST['addNewProject'])){
+      $projectName = addslashes($_POST['projectName']);
+      $projectOwn = $_POST['projectOwn'];
+      $projectGuide = $_POST['projectGuide'];
+      $projectLab = $_POST['projectLab'];
+      $projectStart = $_POST['projectStart'];
+
+      if($projectName && $projectOwn && $projectGuide && $projectStart && $projectLab)
+         {
+           $sql="INSERT INTO project_info(idLab,nameProject,nameUser,nameStaff,dateStart) VALUES ('$projectLab','$projectName','$projectOwn','$projectGuide','$projectStart')";
+           $query = $db->query($sql);
+           new Redirect($_DOMAIN.'admin/projectCP');
+        } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
+      }
+
+      //Xử lý sửa thông tin dự án
+      if (isset($_POST['editProject'])) {
+        $idProject = $_POST['toProject'];
+        $nameProject = $_POST['nameProject'];
+        $projectGuide = $_POST['projectGuide'];
+        $startProject = $_POST['projectStart'];
+        // echo $idProject.' '.$nameProject.' '.$projectGuide.' '.$startProject;
+
+        if ($nameProject) {
+            $sql_edit_project = "UPDATE project_info SET nameProject = '$nameProject',nameStaff = '$projectGuide',dateStart = '$startProject' WHERE idProject = '$idProject'";
+            $db->query($sql_edit_project);
+            new Success($_DOMAIN.'admin/projectCP/');
+        } else new Warning($_DOMAIN.'admin/projectCP','Vui lòng điền đầy đủ thông tin');
+      }
+
+      //Xóa nhiều dự án
+      if (isset($_POST['delPrj'])) {
+        $id_prj_del = $_POST['idPrj'];
+        foreach ($id_prj_del as $key => $data) {
+          $sql_del_prj = "DELETE FROM project_info WHERE idProject = '$data'";
+
+          $sql_get_prj = "SELECT * FROM project_info_detail WHERE idProject = '$data'";
+          if ($db->num_rows($sql_get_prj)) {
+            $sql_del_members = "DELETE FROM project_info_detail WHERE idProject = '$data'";
+            $db->query($sql_del_prj);
+            $db->query($sql_del_members);
+          } else {
+            $db->query($sql_del_prj);
+          }
+        }
+        new Success($_DOMAIN.'admin/projectCP','Xóa dự án thành công');
+      }
+
+      //Thêm vào Lab nhiều dự án
+      if (isset($_POST['addToLab'])) {
+        if ($_POST['idPrj']) {
+        $id_prj = $_POST['idPrj'];
+        $lab = $_POST['addLab'];
+
+        foreach ($id_prj as $key => $data) {
+            $sql_add_lab = "UPDATE project_info SET idLab = '$lab' WHERE idProject = '$data'";
+            $db->query($sql_add_lab);
+          }
+          new Success($_DOMAIN.'admin/projectCP','Thêm vào Lab thành công');
+        } else new Warning('','Chưa chọn dự án');
+      }
+  ?>
 <table id="infoDevice" class="table table-striped">
         <thead>
             <tr>
-                <th>Mã số</th>
+                <th>--</th>
+                <th>ID</th>
                 <th>Tên dự án</th>
                 <th>Chủ nhiệm</th>
                 <th>Hướng dẫn</th>
@@ -39,12 +131,13 @@ new Role($roleUser);?>
 
               foreach ($db->fetch_assoc($val, 0) as $key => $row) {
                 echo '<tr>
+                    <td><input type="checkbox" name="idPrj[]" value="' . $row['idProject'] .'"></td>
                     <td>'.$row['idProject'].'</td>
                     <td>'.$row['nameProject'].'</td>
                     <td>'.$row['nameUser'].'</td>
                     <td>'.$row['nameStaff'].'</td>
                     <td>'.$row['date'].'</td>
-                    <td><a href="" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                    <td><button type="button" id="thisDevice" class="btn btn-primary" data-id="'.$row['idProject'].'" data-project="'.$row['nameProject'].'" data-name="'.$row['nameUser'].'" data-toggle="modal" data-target="#editThisProject"><span class="glyphicon glyphicon-pencil"></span></button></td>
                 </tr>';
               }
           } else {
@@ -53,6 +146,7 @@ new Role($roleUser);?>
           ?>
         </tbody>
     </table>
+  </form>
 
     <div class="container">
 <?php
@@ -141,37 +235,35 @@ echo $paging->html();
         </div>
     </div>
 
-    <!-- <div id="editProject" class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div id="editThisProject" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Chỉnh sửa dự án</h4>
+                    <h4 class="modal-title">Chỉnh sửa dự án</h4>
                 </div>
                 <div class="modal-body">
-                    <form>
+                  <form action="<?php echo $_DOMAIN; ?>admin/projectCP" method="post">
+                    <input type="hidden" name="toProject" id="toThisProject" value=""/>
                       <fieldset class="form-group">
                           <label for="projectName">Tên dự án</label>
-                          <input type="text" class="form-control" name="projectName" id="projectName" placeholder="Nhập tên dự án">
+                          <input type="text" class="form-control" name="nameProject" id="toNameProject" value="" placeholder="Nhập tên dự án">
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="projectOwn">Chủ nhiệm</label>
-                          <select class="form-control" name="projectOwn" id="projectOwn">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                          </select>
+                          <input type="text" class="form-control" name="nameUser" id="toNameUser" value="" placeholder="Nhập tên dự án" disabled>
                       </fieldset>
                       <fieldset class="form-group">
                           <label for="projectGuide">Hướng dẫn</label>
                           <select class="form-control" name="projectGuide" id="projectGuide">
                             <option>Tự nghiên cứu</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
+                            <?php
+                                //Chọn người hướng dẫn
+                                $sql_producer = "SELECT fullName FROM user_info WHERE type = 1";
+                                foreach ($db->fetch_assoc($sql_producer,0) as $key => $data) {
+                                  echo '<option value="'.$data['fullName'].'">'.$data['fullName'].'</option>';
+                                }
+                            ?>
                           </select>
                           <small class="text-muted">Nếu tự nghiên cứu, chọn Tự nghiên cứu</i></small>
                       </fieldset>
@@ -182,12 +274,11 @@ echo $paging->html();
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteProject">Xóa</button>
-                    <button type="submit" class="btn btn-primary">Đồng ý</button></form>
+                    <button type="submit" name="editProject"class="btn btn-primary">Thêm</button></form>
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
 
 
@@ -211,20 +302,22 @@ echo $paging->html();
     </div> -->
 
 
-<?php
-//Thêm dự án
-  if(isset($_POST['addNewProject'])){
-    $projectName = addslashes($_POST['projectName']);
-    $projectOwn = $_POST['projectOwn'];
-    $projectGuide = $_POST['projectGuide'];
-    $projectLab = $_POST['projectLab'];
-    $projectStart = $_POST['projectStart'];
 
-    if($projectName && $projectOwn && $projectGuide && $projectStart && $projectLab)
-       {
-         $sql="INSERT INTO project_info(idLab,nameProject,nameUser,nameStaff,dateStart) VALUES ('$projectLab','$projectName','$projectOwn','$projectGuide','$projectStart')";
-         $query = $db->query($sql);
-         new Redirect($_DOMAIN.'admin/projectCP');
-      } else echo '<div class="alert alert-warning">Vui lòng điền đầy đủ thông tin.</div>';
-    }
-?>
+<!-- JS Function -->
+<script language="JavaScript">
+// using latest bootstrap so, show.bs.modal
+//delProject
+// $('#addTotal').on('show.bs.modal', function(e) {
+//   var product = $(e.relatedTarget).data('id');
+//   $("#toAddTotal").val(product);
+// });
+//editProject
+$('#editThisProject').on('show.bs.modal', function(e) {
+  var id = $(e.relatedTarget).data('id');
+  $("#toThisProject").val(id);
+  var projectname = $(e.relatedTarget).data('project');
+  $("#toNameProject").val(projectname);
+  var name = $(e.relatedTarget).data('name');
+  $("#toNameUser").val(name);
+});
+</script>

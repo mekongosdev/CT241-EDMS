@@ -1,9 +1,11 @@
-<a href="<?php echo $_DOMAIN; ?>admin/project" class="buttonFixed adminCP"></a>
-
 <?php
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 new Role($roleUser);
+
+if (requestRole($roleUser,'projectCP') == 1) {
+  echo '<a href="'.$_DOMAIN.'admin/projectCP" class="buttonFixed adminCP"></a>';
+}
 ?>
     <legend>
         <h1>Danh sách Dự án</h1></legend>

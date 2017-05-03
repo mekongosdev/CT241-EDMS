@@ -1,8 +1,12 @@
-<a href="<?php echo $_DOMAIN; ?>admin/labs" class="buttonFixed adminCP"></a>
 <?php
 // Nếu đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 new Role($roleUser);
+
+if (requestRole($roleUser,'labsCP') == 1) {
+  echo '<a href="'.$_DOMAIN.'admin/labsCP" class="buttonFixed adminCP"></a>';
+}
+
 if (isset($_GET["tab"])) {
 	//Get tab va trả về kết quả theo ý muốn
       if ($_GET["tab"] == "info") {

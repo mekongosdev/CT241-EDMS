@@ -13,7 +13,7 @@ $db->set_char('utf8');
 
 // Thông tin chung
 // $_DOMAIN = 'http://admin.dev/demo_ptycpm/';
-$_DOMAIN = 'http://192.168.1.6/demo_ptycpm/';
+$_DOMAIN = 'http://192.168.1.5/demo_ptycpm/';
 
 
 date_default_timezone_set('Asia/Ho_Chi_Minh');

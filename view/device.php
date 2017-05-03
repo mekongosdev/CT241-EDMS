@@ -1,4 +1,8 @@
-<a href="<?php echo $_DOMAIN; ?>admin/deviceCP" class="buttonFixed adminCP"></a>
+<?php
+if (requestRole($roleUser,'deviceCP') == 1) {
+  echo '<a href="'.$_DOMAIN.'admin/deviceCP" class="buttonFixed adminCP"></a>';
+}
+?>
 
 <?php
 // Nếu chưa đăng nhập
@@ -17,11 +21,11 @@ new Role($roleUser);
       $user_borrow = $user;//Thanh vien dang dang nhap
 
       //Get idDevice hien tai va xuat ra idDevice moi nhat
-      $qry_get_idBorrowDevice = "SELECT idBorrowDevice FROM borrow_device ORDER BY idBorrowDevice DESC";
-      if ($db->num_rows($qry_get_idBorrowDevice)) {
-         $idNow = $db->num_rows($qry_get_idBorrowDevice);
-         $idNewest = $idNow + 1;
-      } else $idNewest = 1;
+      // $qry_get_idBorrowDevice = "SELECT idBorrowDevice FROM borrow_device ORDER BY idBorrowDevice DESC";
+      // if ($db->num_rows($qry_get_idBorrowDevice)) {
+      //    $idNow = $db->num_rows($qry_get_idBorrowDevice);
+      //    $idNewest = $idNow + 1;
+      // } else $idNewest = 1;
       //Dem tong so thiet bi
       $qry_total = "SELECT total FROM device_info WHERE idDevice = '$idDevice'";
       foreach ($db->fetch_assoc($qry_total,0) as $key => $result) {
@@ -30,12 +34,12 @@ new Role($roleUser);
       $totalNow = $totalDevice - $total;
       //Ghi nhan qua trinh muon
       $qry_borrow = "INSERT INTO borrow_device(idDevice,idProject,totalBorrow) VALUES ('$idDevice','$idProject','$total')";
-      $qry_borrow_detail = "INSERT INTO borrow_device_detail(idBorrowDevice,idUser,statusBorrow,dateBorrow) VALUES ('$idNewest','$user_borrow',3,'$date_current')";//status = 0 -> waiting accept
+      $qry_borrow_detail = "INSERT INTO borrow_device_detail(idUser,statusBorrow,dateBorrow) VALUES ('$user_borrow',3,'$date_current')";//status = 0 -> waiting accept
       if ($totalDevice > 0) {
           if ($total <= $totalDevice) {
               $db->query($qry_borrow);
               $db->query($qry_borrow_detail);
-              new Success($_DOMAIN.'device','Đăng ký mượn thành công');
+              new Success('','Đăng ký mượn thành công');
           } else new Warning($_DOMAIN.'device','Vượt quá số lượng hiện có');
       } else new Warning($_DOMAIN.'device','Không còn thiết bị này để mượn');
   }

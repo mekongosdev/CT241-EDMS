@@ -279,10 +279,6 @@ Function day_limit($date_before,$date_after,$limit) {
 // }
 class Role {
     public function __construct($roleUser = null) {
-        // if ($url)
-        // {
-        //     echo '<script>location.href="'.$url.'";</script>';
-        // }
         if (isset($_GET['action'])) {
           if ($_GET['action'] == 'admin') {
             $area = $_GET['action'];
@@ -297,4 +293,7 @@ class Role {
     }
 }
 
+function requestRole($roleUser,$request) {
+      	return ( in_array("fullcontrol",$roleUser) || in_array($request,$roleUser)) ? 1 : 0;
+      }
 ?>

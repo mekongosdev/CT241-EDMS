@@ -1,8 +1,11 @@
-<a href="<?php echo $_DOMAIN; ?>admin/members" class="buttonFixed adminCP"></a>
 <?php
 // Nếu chưa đăng nhập
 if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 new Role($roleUser);
+
+if (requestRole($roleUser,'membersCP') == 1) {
+  echo '<a href="'.$_DOMAIN.'admin/membersCP" class="buttonFixed adminCP"></a>';
+}
 ?>
   <div><br  /></div>
 

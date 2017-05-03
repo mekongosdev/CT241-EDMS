@@ -5,14 +5,96 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 new Role($roleUser);?>
 
 <h3>Quản lý thành viên</h3>
-  <button class="btn btn-success" data-toggle="modal" data-target="#addMember">Thêm thành viên mới</button>
-  <a href="<?php echo $_DOMAIN; ?>admin/membersCP" class="btn btn-default">
-      <span class="glyphicon glyphicon-repeat"></span> Tải lại
-  </a>
+<form action="<?php echo $_DOMAIN; ?>admin/membersCP" method="POST" class="form-inline">
+  <div class="form-group">
+    <a class="btn btn-success" data-toggle="modal" data-target="#addMember">
+      <span class="glyphicon glyphicon-plus"></span> Thêm thành viên mới
+    </a>
+    <a href="<?php echo $_DOMAIN; ?>admin/membersCP" class="btn btn-default">
+        <span class="glyphicon glyphicon-repeat"></span> Tải lại
+    </a>
+  </div>
 
+  <div class="form-group">
+    <label for="prj"> | Chọn dự án:</label>
+    <select class="form-control" name="addPrj" id="prj">
+      <?php
+          //Chọn người hướng dẫn
+          $sql_producer = "SELECT idProject,nameProject FROM project_info";
+          foreach ($db->fetch_assoc($sql_producer,0) as $key => $data) {
+            echo '<option value="'.$data['idProject'].'">'.$data['nameProject'].'</option>';
+          }
+      ?>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <button class="btn btn-primary form-inline" name="addToPrj" type="submit">
+        <span class="glyphicon glyphicon-plus"></span> Thêm vào dự án
+    </button>
+  </div>
+
+
+  <?php
+  //Xử lý thêm thành viên
+  if (isset($_POST['addNewMember'])) {
+    $name = $_POST['nameMember'];
+    $idUser = $_POST['idMember'];
+    $phone = $_POST['phoneMember'];
+    $email = $_POST['mailMember'];
+    $position = $_POST['positionMember'];
+    $level = $_POST['levelMember'];
+    $type = $_POST['typeMember'];
+
+    if ($name && $idUser && $phone && $email && $position && $level) {
+        $sql_add_user = "INSERT INTO user_info(idUser,idImg,fullName,phone,email,website,social,address,position,level,unit,type) VALUES ('$idUser',1,'$name','$phone','$email','không có','không có','ĐH Cần Thơ','$position','$level','Khoa CNTT&TT','$type')";
+        $db->query($sql_add_user);
+        new Success($_DOMAIN.'admin/account/');
+    } else new Warning($_DOMAIN.'admin/membersCP','Vui lòng điền đầy đủ thông tin');
+  }
+
+  //Xử lý sửa thông tin thành viên
+  if (isset($_POST['editInfoMember'])) {
+    $idUser = $_POST['toEditMember'];
+    $position = $_POST['positionMember'];
+    $level = $_POST['levelMember'];
+    $unit = $_POST['unitMember'];
+    $type = $_POST['typeMember'];
+
+    if ($position && $level && $unit) {
+        $sql_edit_user = "UPDATE user_info SET position = '$position',level = '$level',unit = '$unit',type = '$type' WHERE idUser = '$idUser'";
+        $db->query($sql_edit_user);
+        new Success($_DOMAIN.'admin/membersCP/');
+    } else new Warning($_DOMAIN.'admin/membersCP','Vui lòng điền đầy đủ thông tin');
+  }
+
+  //Xử lý xóa thành viên
+  if (isset($_POST['delMember'])) {
+    $idUser = $_POST['toDelMember'];
+
+    $sql_del_user = "DELETE FROM user_info WHERE idUser = '$idUser'";
+    $db->query($sql_del_user);
+    new Success($_DOMAIN.'admin/membersCP/');
+  }
+
+  //Thêm vào dự án nhiều thành viên
+  if (isset($_POST['addToPrj'])) {
+    if ($_POST['idMember']) {
+    $id_member = $_POST['idMember'];
+    $prj = $_POST['addPrj'];
+
+    foreach ($id_member as $key => $data) {
+        $sql_add_prj = "INSERT INTO project_info_detail(idProject,idUser) VALUES ('$prj','$data')";
+        $db->query($sql_add_prj);
+      }
+      new Success($_DOMAIN.'admin/membersCP','Thêm vào dự án thành công');
+    } else new Warning('','Chưa chọn thành viên');
+  }
+  ?>
 <table id="infoDevice" class="table table-striped">
         <thead>
             <tr>
+                <th>--</th>
                 <th>Mã số</th>
                 <th>Họ tên</th>
                 <th>Điện thoại</th>
@@ -37,6 +119,7 @@ new Role($roleUser);?>
 
               foreach ($db->fetch_assoc($val, 0) as $key => $row) {
                 echo '<tr>
+                    <td><input type="checkbox" name="idMember[]" value="' . $row['idUser'] .'"></td>
                     <td>'.$row['idUser'].'</td>
                     <td><a href="'.$_DOMAIN.'profile/'.$row['idUser'].'">'.$row['fullName'].'</td>
                     <td><a href="tel:'.$row['phone'].'">'.$row['phone'].'</td>
@@ -53,7 +136,7 @@ new Role($roleUser);?>
           ?>
         </tbody>
     </table>
-
+</form>
     <div class="container">
 <?php
 $row="SELECT idUser FROM user_info";
@@ -232,46 +315,3 @@ if (!$db->num_rows($sql_query_new_member)) {
       $("#toDelMember").val(product);
     });
     </script>
-
-<?php
-//Xử lý thêm thành viên
-if (isset($_POST['addNewMember'])) {
-  $name = $_POST['nameMember'];
-  $idUser = $_POST['idMember'];
-  $phone = $_POST['phoneMember'];
-  $email = $_POST['mailMember'];
-  $position = $_POST['positionMember'];
-  $level = $_POST['levelMember'];
-  $type = $_POST['typeMember'];
-
-  if ($name && $idUser && $phone && $email && $position && $level) {
-      $sql_add_user = "INSERT INTO user_info(idUser,idImg,fullName,phone,email,website,social,address,position,level,unit,type) VALUES ('$idUser',1,'$name','$phone','$email','không có','không có','ĐH Cần Thơ','$position','$level','Khoa CNTT&TT','$type')";
-      $db->query($sql_add_user);
-      new Success($_DOMAIN.'admin/account/');
-  } else new Warning($_DOMAIN.'admin/membersCP','Vui lòng điền đầy đủ thông tin');
-}
-
-//Xử lý sửa thông tin thành viên
-if (isset($_POST['editInfoMember'])) {
-  $idUser = $_POST['toEditMember'];
-  $position = $_POST['positionMember'];
-  $level = $_POST['levelMember'];
-  $unit = $_POST['unitMember'];
-  $type = $_POST['typeMember'];
-
-  if ($position && $level && $unit) {
-      $sql_edit_user = "UPDATE user_info SET position = '$position',level = '$level',unit = '$unit',type = '$type' WHERE idUser = '$idUser'";
-      $db->query($sql_edit_user);
-      new Success($_DOMAIN.'admin/membersCP/');
-  } else new Warning($_DOMAIN.'admin/membersCP','Vui lòng điền đầy đủ thông tin');
-}
-
-//Xử lý xóa thành viên
-if (isset($_POST['delMember'])) {
-  $idUser = $_POST['toDelMember'];
-
-  $sql_del_user = "DELETE FROM user_info WHERE idUser = '$idUser'";
-  $db->query($sql_del_user);
-  new Success($_DOMAIN.'admin/membersCP/');
-}
-?>

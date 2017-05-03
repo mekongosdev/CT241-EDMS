@@ -4,11 +4,16 @@ new Role($roleUser);?>
 
 <a href="#" class="buttonFixed addBrg" data-toggle="modal" data-target="#addDevice"></a>
 
+
 <h3>Quản lý thiết bị</h3>
-  <button class="btn btn-success" data-toggle="modal" data-target="#addDevice">Thêm thiết bị mới</button>
+<form action="<?php echo $_DOMAIN; ?>admin/deviceCP" method="POST">
+  <?php if (requestRole($roleUser,'addDevice') == 1) {echo '<a class="btn btn-success" data-toggle="modal" data-target="#addDevice">Thêm thiết bị mới</a>';} ?>
+
+  <?php if (requestRole($roleUser,'removeDevice') == 1) {echo '<button class="btn btn-danger" name="trashDeviceBtn" type="submit"><span class="glyphicon glyphicon-trash"></span> Xóa thiết bị</button>';} ?>
   <a href="<?php echo $_DOMAIN; ?>admin/deviceCP" class="btn btn-default">
       <span class="glyphicon glyphicon-repeat"></span> Tải lại
   </a>
+
 
   <?php
   //Thêm thiết bị
@@ -69,34 +74,138 @@ new Role($roleUser);?>
         } else new Warning($_DOMAIN.'admin/deviceCP','Vui lòng điền đầy đủ thông tin');
       }
 
-      //Xử lý icon bị xóa
-      $sql_get_num_rows = "SELECT idDevice FROM device_info";
-      $num = $db->num_rows($sql_get_num_rows);
-      for ($i = 1; $i <= $num; $i++) {
-        $sql_get_icon_device = "SELECT urlImg FROM device_info WHERE idDevice = '$i'";
-        foreach ($db->fetch_assoc($sql_get_icon_device,1) as $key => $img) {
-          if (!file_exists($img))
-            {
-              // new Info('','Hình ảnh thiết bị đã bị xóa! Hệ thống tự động chuyển về hình ảnh mặc định sau 2s.');
-              $sql_img_default = "UPDATE device_info SET urlImg = '$imgDeviceDefault' WHERE idDevice = '$i'";
-              $db->query($sql_img_default);
-              new Reload($_DOMAIN.'admin/deviceCP');
+      //Xử lý sửa thông tin thiết bị
+      if (isset($_POST['edit_device'])) {
+        $idDevice = $_POST['toThisDevice'];
+        $nameDevice = addslashes($_POST['toName']);
+        $dateDevice = $_POST['toDate'];
+        $statusDevice = $_POST['statusDevice'];
+        $totalDevice = $_POST['toTotal'];
+        $pricing = $_POST['toPricing'];
+        $descriptionDevice = $_POST['toDesc'];
+        $producerDevice = $_POST['producerDevice'];
+
+        if ($nameDevice && $totalDevice && $pricing && $descriptionDevice) {
+          // Xử Lý Upload
+          if (isset($_FILES['icon_up'])) {
+              $dir_img = 'view/images/';
+              $name_img = stripslashes($_FILES['icon_up']['name']);
+              $source_img = $_FILES['icon_up']['tmp_name'];
+              $size_img = $_FILES['icon_up']['size']; // Dung lượng file
+
+                if ($size_img > 10485760){
+                    new Warning('','File không được lớn hơn 10MB');
+                } else {
+                    // Upload file
+                    // Tạo folder năm hiện tại
+                    if (!is_dir($dir.$year_current))
+                    {
+                        mkdir($dir.$year_current.'/');
+                    }
+
+                    // Tạo folder tháng hiện tại
+                    if (!is_dir($dir.$year_current.'/'.$month_current))
+                    {
+                        mkdir($dir.$year_current.'/'.$month_current.'/');
+                    }
+
+                    // Tạo folder ngày hiện tại
+                    if (!is_dir($dir.$year_current.'/'.$month_current.'/'.$day_current))
+                    {
+                        mkdir($dir.$year_current.'/'.$month_current.'/'.$day_current.'/');
+                    }
+
+                    $path_img = $dir.$year_current.'/'.$month_current.'/'.$day_current.'/'.$name_img; // Đường dẫn thư mục chứa file
+                    move_uploaded_file($source_img, $path_img); // Upload file
+                    $array = (explode(".",$name_img));
+                    $type_img = $array[1];// Loại file
+                    $url_img = $path_img; // Đường dẫn file
+
+                    // Thêm ảnh vào table images
+                    $sql_up_file = "INSERT INTO images VALUES ('','$url_img','$type_img','$size_img','$date_current')";
+                    $db->query($sql_up_file);
+                    }
+                }
+            $sql_edit_device = "UPDATE device_info SET idProducer = '$producerDevice',urlImg = '$url_img',nameDevice = '$nameDevice',status = '$statusDevice',pricing = '$pricing',dateImport = '$dateDevice',total = '$totalDevice',description = '$descriptionDevice' WHERE idDevice = '$idDevice'";
+            $db->query($sql_edit_device);
+            new Success($_DOMAIN.'admin/deviceCP/');
+        } else new Warning($_DOMAIN.'admin/deviceCP','Vui lòng điền đầy đủ thông tin');
+      }
+
+      //Xử lý xóa thiết bị
+      if (isset($_POST['trashDeviceBtn'])) {
+        $trash = $_POST['idDevice'];
+        $stt = array();
+
+        if ($trash) {
+          foreach ($trash as $key => $data) {
+            $sql_get_borrow = "SELECT * FROM borrow_device a, borrow_device_detail b, device_info c WHERE (a.idDevice = c.idDevice ) AND (a.idBorrowDevice = b.idBorrowDeviceDetail) AND c.idDevice = '$data'";
+            foreach ($db->fetch_assoc($sql_get_borrow,0) as $key => $get_borrow) {
+              array_push($stt,$get_borrow['statusBorrow']);
             }
+            $sql_get_total_device = "SELECT total FROM device_info WHERE idDevice = '$data'";
+            foreach ($db->fetch_assoc($sql_get_borrow,1) as $key => $get_total) {
+              $totalDevice = $get_total;
+            }
+            if (in_array(5,$stt) || in_array(4,$stt) || in_array(2,$stt)) {
+              echo 'OK';
+              // $sql_upd_device = "UPDATE device_info SET total = 0 WHERE idDevice = '$data'";
+              // $db->query($sql_upd_device);
+            } else {
+              echo 'Cancel';
+              // $sql_del_device = "UPDATE device_info SET displayDevice = 0 WHERE idDevice = '$data'";
+              // $db->query($sql_del_device);
+            }
+          }
+          // new Success($_DOMAIN.'admin/deviceCP');
         }
       }
 
-  ?>
+      //Nhập kho
+      if (isset($_POST['addTotals'])) {
+        $idTotal = $_POST['toAddTotal'];
+        $total = $_POST['total'];
 
+        //GET totalDevice
+        $sql_get_total = "SELECT total FROM device_info WHERE idDevice = '$idTotal'";
+        foreach ($db->fetch_assoc($sql_get_total,1) as $key => $get) {
+          $total_present = $get;
+        }
+
+        $total_add = $total_present + $total;
+        $sql_add_total = "UPDATE device_info SET total = '$total_add' WHERE idDevice = '$idTotal'";
+        $db->query($sql_add_total);
+        new Success($_DOMAIN.'admin/deviceCP','Nhập kho thành công');
+      }
+
+      //Xử lý icon bị xóa
+      // $sql_get_num_rows = "SELECT idDevice FROM device_info";
+      // $num = $db->num_rows($sql_get_num_rows);
+      // for ($i = 1; $i <= $num; $i++) {
+      //   $sql_get_icon_device = "SELECT urlImg FROM device_info WHERE idDevice = '$i'";
+      //   foreach ($db->fetch_assoc($sql_get_icon_device,1) as $key => $img) {
+      //     if (!file_exists($img))
+      //       {
+      //         // new Info('','Hình ảnh thiết bị đã bị xóa! Hệ thống tự động chuyển về hình ảnh mặc định sau 2s.');
+      //         $sql_img_default = "UPDATE device_info SET urlImg = '$imgDeviceDefault' WHERE idDevice = '$i'";
+      //         $db->query($sql_img_default);
+      //         new Reload($_DOMAIN.'admin/deviceCP');
+      //       }
+      //   }
+      // }
+
+  ?>
 <table id="infoDevice" class="table table-striped">
         <thead>
             <tr>
-                <th>Mã số</th>
+                <th>--</th>
+                <th>ID</th>
                 <th>Hình ảnh</th>
                 <th>Tên thiết bị</th>
                 <th>Mô tả</th>
                 <th>Ngày nhập</th>
                 <th>Trạng thái</th>
-                <th>Giá trị</th>
+                <th>Đơn giá</th>
                 <th>Số lượng</th>
                 <th>Chỉnh sửa</th>
             </tr>
@@ -114,10 +223,11 @@ new Role($roleUser);?>
                    $start=($_GET['act']-1)*$row_per_page; //dòng bắt đầu từ nơi ta muốn lấy
               else $start=0;
               // var_dump($start);
-              $val_device = "SELECT *,DATE_FORMAT( dateImport,  '%d/%m/%Y' ) AS date FROM device_info a,partner_info b WHERE (a.idProducer = b.idProducer) ORDER BY a.idDevice DESC limit $start,$row_per_page";
+              $val_device = "SELECT *,DATE_FORMAT( dateImport,  '%d/%m/%Y' ) AS date FROM device_info a,partner_info b WHERE (a.idProducer = b.idProducer) AND a.displayDevice = 1 ORDER BY a.idDevice DESC limit $start,$row_per_page";
 
               foreach ($db->fetch_assoc($val_device, 0) as $key => $row) {
                 echo '<tr>
+                    <td><input type="checkbox" name="idDevice[]" value="' . $row['idDevice'] .'"></td>
                     <td>'.$row['idDevice'].'</td>
                     <td><img src="'.$_DOMAIN.$row['urlImg'].'" style="width:100px;height:100px;"/></td>
                     <td>'.$row['nameDevice'].'</td>
@@ -128,8 +238,7 @@ new Role($roleUser);?>
                     <td>'.$row['total'].'</td>
                     <td>
                         <button type="button" id="thisaddTotal" class="btn btn-warning" data-id="'.$row['idDevice'].'" data-toggle="modal" data-target="#addTotal"><span class="glyphicon glyphicon-plus"></span></button>
-                        <button type="button" id="thiseditDevice" class="btn btn-primary" data-id="'.$row['idDevice'].'" data-name="'.$row['nameDevice'].'" data-description="'.$row['description'].'" data-pricing="'.$row['pricing'].'" data-total="'.$row['total'].'" data-toggle="modal" data-target="#editThisDevice"><span class="glyphicon glyphicon-pencil"></span></button>
-                        <button type="button" id="thisdelDevice" class="btn btn-danger" data-id="'.$row['idDevice'].'" data-toggle="modal" data-target="#deleteDevice"><span class="glyphicon glyphicon-trash"></span></button>
+                        <button type="button" id="thiseditDevice" class="btn btn-primary" data-id="'.$row['idDevice'].'" data-name="'.$row['nameDevice'].'" data-description="'.$row['description'].'" data-pricing="'.$row['pricing'].'" data-total="'.$row['total'].'" data-date="'.$row['date'].'" data-toggle="modal" data-target="#editThisDevice"><span class="glyphicon glyphicon-pencil"></span></button>
                     </td>
                 </tr>';
               }
@@ -139,8 +248,9 @@ new Role($roleUser);?>
           ?>
         </tbody>
     </table>
+  </form>
 
-    <div class="container">
+<div class="container">
 <?php
 $row="SELECT idDevice FROM device_info";
 $rows=$db->num_rows($row);
@@ -235,17 +345,18 @@ echo $paging->html();
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Thêm thiết bị mới</h4>
+                    <h4 class="modal-title">Chỉnh sửa thiết bị</h4>
                 </div>
                 <div class="modal-body">
                     <form action="<?php echo $_DOMAIN; ?>admin/deviceCP" method="post" enctype="multipart/form-data">
+                      <input type="hidden" name="toThisDevice" id="toThisDevice" value=""/>
                         <fieldset class="form-group">
                             <label for="nameDevice">Tên thiết bị</label>
-                            <input type="text" class="form-control" name="nameDevice" id="nameDevice" placeholder="Nhập tên thiết bị">
+                            <input type="text" class="form-control" name="toName" id="toName" value="" placeholder="Nhập tên thiết bị">
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="dateDevice">Ngày nhập</label>
-                            <input type="date" class="form-control" name="dateDevice" id="dateDevice" placeholder="Chọn ngày nhập">
+                            <input type="date" class="form-control" name="toDate" placeholder="Chọn ngày nhập">
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="statusDevice">Tình trạng nhập vào</label>
@@ -262,19 +373,19 @@ echo $paging->html();
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="totalDevice">Số lượng</label>
-                            <input type="number" class="form-control" name="totalDevice" id="totalDevice" placeholder="Nhập số lượng">
+                            <input type="number" class="form-control" name="toTotal" id="toTotal" value="" placeholder="Nhập số lượng">
                         </fieldset>
                         <fieldset class="form-group">
-                            <label for="currencyDevice">Đơn vị tính</label>
-                            <input type="text" class="form-control" name="currencyDevice" id="currencyDevice" placeholder="Nhập đơn vị tính">
+                            <label for="currencyDevice">Đơn giá thiết bị</label>
+                            <input type="text" class="form-control" name="toPricing" id="toPricing" placeholder="Nhập đơn giá">
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="descriptionDevice">Mô tả</label>
-                            <input type="text" class="form-control" name="descriptionDevice" id="descriptionDevice" placeholder="Nhập mô tả về thiết bị">
+                            <input type="text" class="form-control" name="toDesc" id="toDesc" value="" placeholder="Nhập mô tả về thiết bị">
                         </fieldset>
                         <fieldset class="form-group">
                             <label for="partnerDevice">Nhà cung cấp/sản xuất</label>
-                            <select class="form-control" name="partnerDevice" id="partnerDevice">
+                            <select class="form-control" name="producerDevice" id="producerDevice">
                               <option value="Other">Other</option>
                               <?php
                                   //Chọn nhà sản xuất
@@ -293,7 +404,7 @@ echo $paging->html();
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-                    <button type="submit" name="add_device" class="btn btn-primary">Thêm</button></form>
+                    <button type="submit" name="edit_device" class="btn btn-primary">Đồng ý</button></form>
                 </div>
             </div>
         </div>
@@ -305,15 +416,15 @@ echo $paging->html();
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="">Bạn đang xóa thiết bị!</h4>
+                    <h4 class="modal-title" id="">Nhập bổ sung thiết bị!</h4>
                 </div>
                 <div class="modal-body">
-                    <h3>Bạn có muốn tiếp tục?</h3>
-                    <form>
-                        <div class="modal-footer">
-                            <a href="delete" type="button" class="btn btn-danger">Yes</a>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-                        </div>
+                  <form action="<?php echo $_DOMAIN; ?>admin/deviceCP" method="post">
+                    <input type="hidden" name="toAddTotal" id="toAddTotal" value=""/>
+                    <input type="number" class="form-control" name="total" placeholder="Nhập số lượng bổ sung"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="addTotals" class="btn btn-primary">Đồng ý</button></form>
                 </div>
             </div>
         </div>
@@ -338,3 +449,26 @@ echo $paging->html();
             </div>
         </div>
     </div>
+
+    <!-- JS Function -->
+    <script language="JavaScript">
+    // using latest bootstrap so, show.bs.modal
+    //delDevice
+    $('#addTotal').on('show.bs.modal', function(e) {
+      var id = $(e.relatedTarget).data('id');
+      $("#toAddTotal").val(id);
+    });
+    //editDevice
+    $('#editThisDevice').on('show.bs.modal', function(e) {
+      var id = $(e.relatedTarget).data('id');
+      $("#toThisDevice").val(id);
+      var name = $(e.relatedTarget).data('name');
+      $("#toName").val(name);
+      var description = $(e.relatedTarget).data('description');
+      $("#toDesc").val(description);
+      var pricing = $(e.relatedTarget).data('pricing');
+      $("#toPricing").val(pricing);
+      var total = $(e.relatedTarget).data('total');
+      $("#toTotal").val(total);
+    });
+    </script>
