@@ -23,7 +23,6 @@ new Role($roleUser);?>
   <div class="form-group">
     <label for="lab"> | Chọn Lab:</label>
     <select class="form-control" name="addLab" id="lab">
-      <option value="Tự nghiên cứu">Không có Lab</option>
       <?php
           //Chọn người hướng dẫn
           $sql_producer = "SELECT idLab,nameLab FROM lab_info";
@@ -211,7 +210,6 @@ echo $paging->html();
                       <fieldset class="form-group">
                           <label for="projectLab">Phòng thí nghiệm</label>
                           <select class="form-control" name="projectLab" id="projectLab">
-                            <option value="0">Không có Lab</option>
                             <?php
                                 //Chọn lab
                                 $sql_lab = "SELECT idLab,nameLab FROM lab_info";
