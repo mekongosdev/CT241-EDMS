@@ -58,7 +58,7 @@ foreach ($db->fetch_assoc($sql_get_setting, 0) as $key=>$data){
 <?php
   if (isset($_GET["action"])) {
     if ($_GET["action"] == "admin" || $_GET["action"] == "labs" || $_GET["action"] == "profile")
-        echo '<div class="none" style="padding:37px;"></div>';
-    else echo '<div class="none" style="padding:35px;"></div>';
-  } else echo '<div class="none" style="padding:35px;"></div>';
+        echo '<div class="none" style="padding:27px;"></div>';
+    else echo '<div class="none" style="padding:25px;"></div>';
+  } else echo '<div class="none" style="padding:25px;"></div>';
 ?>

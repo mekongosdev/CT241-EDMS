@@ -180,7 +180,7 @@ if (isset($_POST['returnOKBtn'])) {
 if (isset($_POST['refreshOK'])) {
   $refresh = $_POST['toRefreshDevice'];
 
-  $sql_refresh = "UPDATE borrow_device_detail SET statusBorrow = 3, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$refresh'";//status = 2 -> Accept
+  $sql_refresh = "UPDATE borrow_device_detail SET statusBorrow = 6 WHERE idBorrowDeviceDetail = '$refresh'";//status = 2 -> Accept
   if ($refresh) {
     $db->query($sql_refresh);
   }
@@ -190,7 +190,7 @@ if (isset($_POST['refreshOKBtn'])) {
   $refresh = $_POST['idBorrow'];
 
   foreach ($refresh as $key => $data) {
-    $sql_refresh = "UPDATE borrow_device_detail SET statusBorrow = 3, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$data'";//status = 2 -> Accept
+    $sql_refresh = "UPDATE borrow_device_detail SET statusBorrow = 6 WHERE idBorrowDeviceDetail = '$data'";//status = 2 -> Accept
     if ($refresh) {
       $db->query($sql_refresh);
     }
@@ -202,7 +202,7 @@ if (isset($_POST['refreshOKBtn'])) {
 if (isset($_POST['restRefreshOK'])) {
   $rest = $_POST['toRestRefreshDevice'];
 
-  $sql_rest_refresh = "UPDATE borrow_device_detail SET statusBorrow = 3, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$rest'";//status = 5 -> Rest
+  $sql_rest_refresh = "UPDATE borrow_device_detail SET statusBorrow = 2, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$rest'";//status = 5 -> Rest
   if ($rest) {
     $db->query($sql_rest_refresh);
   }
@@ -212,7 +212,7 @@ if (isset($_POST['restRefreshOKBtn'])) {
   $rest = $_POST['idBorrow'];
 
   foreach ($rest as $key => $data) {
-    $sql_rest_refresh = "UPDATE borrow_device_detail SET statusBorrow = 3, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$data'";//status = 5 -> Rest
+    $sql_rest_refresh = "UPDATE borrow_device_detail SET statusBorrow = 2, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$data'";//status = 5 -> Rest
     if ($rest) {
       $db->query($sql_rest_refresh);
     }
@@ -273,11 +273,11 @@ if (isset($_POST['trashOKBtn'])) {
                   // echo $get_status.' ';Test biến get status
                   echo '<tr'; if ($get_status == 0) {
                     echo ' class="alert alert-danger"';
-                  } else if ($get_status == 4 || $get_status == 5) {
+                  } else if ($get_status == 4 || $get_status == 7 || $get_status == 6) {
                     echo ' class="alert alert-warning"';
                   }
                   echo '>
-                      <td>'; if ($get_status == 2 || $get_status == 3 || $get_status == 4 || $get_status == 5) {
+                      <td>'; if ($get_status == 2 || $get_status == 3 || $get_status == 4 || $get_status == 7 || $get_status == 6) {
                         echo '<input type="checkbox" name="idBorrow[]" value="' . $row['idBorrowDeviceDetail'] .'">';
                       } echo '</td>
                       <td>'.$row['idBorrowDeviceDetail'].'</td>
@@ -309,12 +309,19 @@ if (isset($_POST['trashOKBtn'])) {
                           <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
                           <button type="button" id="thisRestRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#restRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
                       </td>';
-                    } else if ($get_status == 5) { echo '
+                    } else if ($get_status == 7) { echo '
                       <td>'.$row['dateBorrow'].'</td>
                       <td>Đã quá hạn</td>
                       <td>
                           <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
                           <button type="button" id="thisborrowRefresh" class="btn btn-success" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
+                      </td>';
+                    } else if ($get_status == 6) { echo '
+                      <td>'.$row['dateBorrow'].'</td>
+                      <td>Đã quá hạn</td>
+                      <td>
+                          <button type="button" id="thisborrowReturn" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowReturn"><span class="glyphicon glyphicon-repeat"></span></button>
+                          <button type="button" id="thisRestRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#restRefresh"><span class="glyphicon glyphicon-refresh"></span></button>
                       </td>';
                     }
                       echo '
@@ -408,7 +415,7 @@ echo $paging->html();
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Đồng ý gửi yêu cầu gia mượn thiết bị</h4>
+                <h4 class="modal-title">Gửi yêu cầu gia mượn thiết bị</h4>
             </div>
             <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>admin/borrowDeviceCP" method="post">
                 <input type="hidden" name="toRestRefreshDevice" id="toRestRefreshDevice" value=""/>
@@ -431,10 +438,6 @@ $('#borrowReturn').on('show.bs.modal', function(e) {
   $("#toReturnDevice").val(product);
 });
 
-$('#borrowRefresh').on('show.bs.modal', function(e) {
-  var product = $(e.relatedTarget).data('id');
-  $("#toRefreshDevice").val(product);
-});
 
 $('#restRefresh').on('show.bs.modal', function(e) {
   var product = $(e.relatedTarget).data('id');

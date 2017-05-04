@@ -42,9 +42,11 @@ if (isset($_GET["tab"])) {
         include("view/admin/borrowDeviceCP.php");
       } else if ($_GET["tab"] == "urlCP") {
         //Chèn trang quan ly muon thiet bi
+        echo '<div class="alert alert-info">Tính năng đang phát triển.</div>';
         // include("view/admin/urlCP.php");
       } else if ($_GET["tab"] == "mailCP") {
         //Chèn trang quan ly muon thiet bi
+        echo '<div class="alert alert-info">Tính năng đang phát triển.</div>';
         // include("view/admin/mailCP.php");
       } else {
         include("view/admin/dashboard.php");

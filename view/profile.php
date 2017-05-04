@@ -4,6 +4,14 @@ if (!$user) new Redirect($_DOMAIN.'login'); // Tro ve trang dang nhap
 new Role($roleUser);
 // else {
     if (isset($_GET['tab'])) {
+      // if ($_GET["tab"] == "info") {
+      //   if (isset($_GET['act'])) {
+      //     if ($_GET["act"]) {
+      //       $idUser = $user;
+      //       //Nội dung hiển thị
+      //     }
+      //   }
+      // } else
       if ($_GET["tab"]) {
         $id=$_GET['tab'];
       } else $id = $user;
@@ -15,12 +23,6 @@ new Role($roleUser);
     {
         $data_user_profile = $db->fetch_assoc($sql_get_data_user, 1);
     }
-    // $sql_get_data_avatar = "SELECT * FROM user_info INNER JOIN images ON user_info.idImg = images.idImg WHERE user_info.idUser = '$id'";
-    // if ($db->num_rows($sql_get_data_avatar))
-    // {
-    //     $data_user_avatar = $db->fetch_assoc($sql_get_data_avatar, 1);
-    // }
-// }
 ?>
 <div class="container">
   <center>
@@ -104,7 +106,97 @@ new Role($roleUser);
             <span><strong>Mạng xã hội: </strong><i><a href="<?php echo $data_user_profile['social']; ?>"><?php echo $data_user_profile['social']; ?></a></i></span><br  />
             <span><strong>Địa chỉ: </strong><?php echo $data_user_profile['address']; ?></span>
         </div>
+        <div class="col-sm-6 profile-info">
+            <div class="divider"></div>
+        </div>
+        <div class="col-sm-6 profile-info">
+            <div class="divider"></div>
+        </div>
     </div>
+    <?php if ($id == $user) {
+    echo '<legend>Thông tin mượn thiết bị</legend>';
+
+
+        $sql_get_borrow = "SELECT * FROM borrow_device_detail WHERE idUser = '$id' ORDER BY idBorrowDeviceDetail DESC";
+        if ($db->num_rows($sql_get_borrow)) {
+
+        //SQL get page
+        $val_page = "SELECT *,DATE_FORMAT( dateBorrow,  '%d/%m/%Y' ) AS dateBorrow,DATE_FORMAT( dateReturn,  '%d/%m/%Y' ) AS dateReturn FROM borrow_device_detail a,borrow_device b,user_info c,device_info d WHERE (a.idBorrowDeviceDetail = b.idBorrowDevice)  AND (a.idUser = c.idUser) AND (b.idDevice = d.idDevice) AND (a.idUser = '$id') ORDER BY statusBorrow DESC";
+
+        //Hiển thị danh sách quản lý mượn thiết bị
+        echo '<form action="'.$_DOMAIN.'profile" method="post">
+        <table id="infoBorrow" class="table table-striped">
+                <thead>
+                    <tr>
+                      <tr>
+                          <th>Mã số</th>
+                          <th>Họ tên</th>
+                          <th>Thiết bị</th>
+                          <th>Số lượng</th>
+                          <th>Ngày mượn</th>
+                          <th>Ngày trả</th>
+                          <th>Tools</th>
+                      </tr>
+                    </tr>
+                </thead>
+                <tbody>';
+
+          foreach ($db->fetch_assoc($val_page, 0) as $key => $row) {
+            $get_status = $row['statusBorrow'];
+            // echo $get_status.' ';Test biến get status
+            if ($get_status != 5) {
+            echo '<tr'; if ($get_status == 0) {
+              echo ' class="alert alert-danger"';
+            } else if ($get_status == 4 || $get_status == 5) {
+              echo ' class="alert alert-warning"';
+            }
+            echo '>
+                <td>'.$row['idBorrowDeviceDetail'].'</td>
+                <td>'.$row['fullName'].'</td>
+                <td>'.$row['nameDevice'].'</td>
+                <td>'.$row['totalBorrow'].'</td>';
+                if ($get_status == 2) { echo '
+                <td>'.$row['dateBorrow'].'</td>
+                <td>'.$row['dateReturn'].'</td>
+                <td></td>';
+              } else if ($get_status == 3) { echo '
+              <td>Chờ duyệt</td>
+              <td>'.$row['dateReturn'].'</td>
+              <td></td>';
+            } else if ($get_status == 0) {
+                echo '<td>Đã từ chối</td><td> </td><td> </td>';
+              } else if ($get_status == 1) { echo '
+                <td>'.$row['dateBorrow'].'</td>
+                <td>'.$row['dateReturn'].'</td>
+                <td> </td>';
+              } else if ($get_status == 4 || $get_status == 6) { echo '
+                <td>'.$row['dateBorrow'].'</td>
+                <td>Đã quá hạn</td>
+                <td>
+                    <button title="Gửi yêu cầu gia hạn" type="button" id="thisRestRefresh" class="btn btn-info" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#borrowRefresh">
+                        <span class="glyphicon glyphicon-new-window"></span>
+                    </button></form>
+                </td>';
+              } else if ($get_status == 5) { echo '
+                <td>'.$row['dateBorrow'].'</td>
+                <td>Đã quá hạn</td>
+                <td>
+                    <button title="Xác nhận yêu cầu gia hạn" type="button" id="thisRestRefresh" class="btn btn-warning" data-id="'.$row['idBorrowDeviceDetail'].'" data-toggle="modal" data-target="#restRefresh">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                    </button></form>
+                </td>';
+              }
+            }
+                echo '
+            </tr>';
+          }
+          echo '</tbody>
+      </table>';
+    } else {
+        echo '<div class="alert alert-info">Chưa có yêu cầu mượn nào.</div>';
+    }
+}
+    ?>
   </center>
 
 <!-- Modal -->
@@ -281,6 +373,50 @@ new Role($roleUser);
       </div>
     </div>
 
+<!--Modal gia hạn mượn thiết bị-->
+<div id="borrowRefresh" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Gia hạn mượn thiết bị</h4>
+            </div>
+            <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>profile" method="post">
+                <input type="hidden" name="toRefreshDevice" id="toRefreshDevice" value=""/>
+                <button type="submit" name="refreshOK" class="btn btn-primary">Đồng ý</button></form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal yêu cầu gian hạn mượn thiết bị-->
+<div id="restRefresh" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Gửi yêu cầu gia mượn thiết bị</h4>
+            </div>
+            <div class="modal-footer"><form action="<?php echo $_DOMAIN; ?>profile" method="post">
+                <input type="hidden" name="toRestRefreshDevice" id="toRestRefreshDevice" value=""/>
+                <button type="submit" name="restRefreshOK" class="btn btn-primary">Đồng ý</button></form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS Function -->
+<script type="text/javascript">
+$('#borrowRefresh').on('show.bs.modal', function(e) {
+  var product = $(e.relatedTarget).data('id');
+  $("#toRefreshDevice").val(product);
+});
+
+$('#restRefresh').on('show.bs.modal', function(e) {
+  var product = $(e.relatedTarget).data('id');
+  $("#toRestRefreshDevice").val(product);
+});
+</script>
 <?php
 // Xử Lý avatar
   if (isset($_FILES['img_up'])) {
@@ -418,5 +554,28 @@ if (isset($_POST['changePass'])) {
     } else new Warning($_DOMAIN.'profile','Mật khẩu không khớp');
   } else new Warning($_DOMAIN.'profile','Vui lòng điền đầy đủ thông tin');
 }
+
+//Xử lý đồng ý gia hạn thiết bị
+if (isset($_POST['refreshOK'])) {
+  $refresh = $_POST['toRefreshDevice'];
+
+  $sql_refresh = "UPDATE borrow_device_detail SET statusBorrow = 2, dateBorrow = '$date_current' WHERE idBorrowDeviceDetail = '$refresh'";//status = 2 -> Accept
+  if ($refresh) {
+    $db->query($sql_refresh);
+  }
+  new Success($_DOMAIN.'profile');
+}
+
+//Xử lý gửi yêu cầu gia hạn thiết bị
+if (isset($_POST['restRefreshOK'])) {
+  $rest = $_POST['toRestRefreshDevice'];
+
+  $sql_rest_refresh = "UPDATE borrow_device_detail SET statusBorrow = 5 WHERE idBorrowDeviceDetail = '$rest'";//status = 5 -> Rest
+  if ($rest) {
+    $db->query($sql_rest_refresh);
+  }
+  new Success($_DOMAIN.'profile');
+}
+
 
 ?>
