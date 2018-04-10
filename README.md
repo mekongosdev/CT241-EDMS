@@ -1,4 +1,4 @@
-# ptycpm_htql_thietbinhung
+# Software Requiments - Embedded Device Management System
 ## URL demo: https://demo.ngthuc.com/project/ptycpm/
 ### This website uses the following technologies and platforms:
 #### Front-end: 
