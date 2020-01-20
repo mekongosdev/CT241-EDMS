@@ -233,7 +233,7 @@ INSERT INTO `user_auth` (`idUser`, `pwd`, `email`, `roleName`, `status`, `dateCr
 ('B1400706', '123123', 'minhb1400706@student.ctu.edu.vn', 'Member', '1', '2017-05-01 08:29:28'),
 ('B1400713', '123123', 'nhutb1400713@student.ctu.edu.vn', 'Member', '0', '2017-05-01 08:29:28'),
 ('B1400729', '123123', 'thob1400729@student.ctu.edu.vn', 'Member', '1', '2017-05-01 08:29:28'),
-('B1400731', '123123', 'thucb1400731@student.ctu.edu.vn', 'Admin', '1', '2017-05-01 08:29:28'),
+('admin', '123123', 'admin@student.ctu.edu.vn', 'Admin', '1', '2017-05-01 08:29:28'),
 ('B1400734', '123123', 'toanb1400734@student.ctu.edu.vn', 'Deny', '1', '2017-05-01 08:29:28'),
 ('B1400797', '123123', 'tiepb1400797@student.ctu.edu.vn', 'Member', '1', '2017-05-01 08:29:29'),
 ('tester', '123123', 'tester@test.dev', 'Admin', '1', '2017-05-01 11:04:51'),
@@ -270,7 +270,7 @@ INSERT INTO `user_info` (`idUser`, `urlImg`, `fullName`, `phone`, `email`, `webs
 ('2709', 'view/icon/default/user.png', 'Trần Văn Hoàng', '0909090909', 'tvhoang@cit.ctu.edu.vn', 'không có', 'không có', 'Xuân Khánh, Cần Thơ', 'Giảng viên', 'Thạc sĩ', 'BM Công nghệ phần mềm', '1'),
 ('B1400704', 'view/icon/default/user.png', 'Lê Minh Luân', '0977177771', 'luanb1400704@student.ctu.edu.vn', 'không có', 'không có', 'ĐH Cần Thơ', 'Thực tập sinh', 'Đại học', 'Khoa CNTT&TT', '0'),
 ('B1400706', 'view/icon/default/user.png', 'Nguyễn Thiện Minh', '01676776677', 'minhb1400706@student.ctu.edu.vn', 'không có', 'không có', 'ĐH Cần Thơ', 'Thực tập sinh', 'Đại học', 'Khoa CNTT&TT', '0'),
-('B1400731', 'view/icon/default/user.png', 'Lê Nguyên Thức', '01678911202', 'thucb1400731@student.ctu.edu.vn', 'https://ngthuc.com/', 'https://fb.com/lenguyenthuc/', 'Hưng Lợi, Cần Thơ', 'Thực tập sinh', 'Đại học', 'BM Công nghệ phần mềm', '0'),
+('admin', 'view/icon/default/user.png', 'Admin', '01234567890', 'admin@student.ctu.edu.vn', 'https://ngthuc.com/', 'https://fb.com/lenguyenthuc/', 'Hưng Lợi, Cần Thơ', 'Thực tập sinh', 'Đại học', 'BM Công nghệ phần mềm', '0'),
 ('B1400797', 'view/icon/default/user.png', 'Trác Mẫn Tiệp', '01677889911', 'tiepb1400797@student.ctu.edu.vn', 'không có', 'không có', 'ĐH Cần Thơ', 'Thực tập sinh', 'Đại học', 'Khoa CNTT&TT', '0');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
